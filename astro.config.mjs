@@ -50,6 +50,12 @@ export default defineConfig({
   },
 
   vite: {
-    plugins: [tailwindcss()]
+    plugins: [tailwindcss()],
+    server: {
+      allowedHosts: ['levelup.aafif.space'],
+    },
+    preview: {
+      allowedHosts: ['levelup.aafif.space'],
+    },
   }
 });

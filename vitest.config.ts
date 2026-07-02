@@ -9,4 +9,10 @@ export default defineConfig({
     setupFiles: ["./vitest.setup.ts"],
     include: ["src/**/*.{test,spec}.{ts,js}"],
   },
+  server: {
+    allowedHosts: ["localhost", "levelup.aafif.space"],
+  },
+  preview: {
+    allowedHosts: ["localhost", "levelup.aafif.space"],
+  },
 });
