@@ -1,0 +1,721 @@
+<!DOCTYPE html>
+<html lang="en" data-scheme="auto">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Topic Markdown Format — Reference</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700;900&family=JetBrains+Mono:wght@400;700&family=Inter:wght@300;400;500&display=swap" rel="stylesheet"/>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  /* ── THEME: DARK (zinc-950 + orange) ───────────────────────────── */
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-scheme="light"]) {
+      --bg:        #09090b;
+      --bg-card:   #18181b;
+      --border:    #27272a;
+      --border-dim:#1c1c1f;
+      --text:      #d4d4d8;
+      --text-muted:#71717a;
+      --text-dim:  #52525b;
+      --text-vdim: #3f3f46;
+      --accent:    #f97316;
+      --accent-6:  #ea580c;
+      --accent-9:  #7c2d12;
+      --accent-bg: rgba(234,88,12,0.08);
+      --accent-bd: rgba(234,88,12,0.25);
+      --red:       #ef4444;
+      --red-lt:    #f87171;
+      --green:     #4ade80;
+      --sidebar-bg:#111113;
+      --pre-bg:    #09090b;
+      --kbd-bg:    #18181b;
+      --kbd-border:#3f3f46;
+      --dot-color: rgba(234,88,12,0.04);
+      --glow:      0 0 20px rgba(234,88,12,0.3);
+    }
+  }
+
+  /* ── THEME: LIGHT (slate-50 + indigo-600) ──────────────────────── */
+  @media (prefers-color-scheme: light) {
+    :root:not([data-scheme="dark"]) {
+      --bg:        #f8fafc;
+      --bg-card:   #ffffff;
+      --border:    #e2e8f0;
+      --border-dim:#f1f5f9;
+      --text:      #1e293b;
+      --text-muted:#64748b;
+      --text-dim:  #94a3b8;
+      --text-vdim: #cbd5e1;
+      --accent:    #14b8a6;
+      --accent-6:  #0d9488;
+      --accent-9:  #134e4a;
+      --accent-bg: rgba(20,184,166,0.08);
+      --accent-bd: rgba(20,184,166,0.25);
+      --red:       #ef4444;
+      --red-lt:    #f87171;
+      --green:     #22c55e;
+      --sidebar-bg:#f1f5f9;
+      --pre-bg:    #f8fafc;
+      --kbd-bg:    #f1f5f9;
+      --kbd-border:#e2e8f0;
+      --dot-color: rgba(20,184,166,0.05);
+      --glow:      none;
+    }
+  }
+
+  /* ── FORCED DARK (overrides system) ────────────────────────────── */
+  :root[data-scheme="dark"] {
+    --bg:        #09090b;
+    --bg-card:   #18181b;
+    --border:    #27272a;
+    --border-dim:#1c1c1f;
+    --text:      #d4d4d8;
+    --text-muted:#71717a;
+    --text-dim:  #52525b;
+    --text-vdim: #3f3f46;
+    --accent:    #f97316;
+    --accent-6:  #ea580c;
+    --accent-9:  #7c2d12;
+    --accent-bg: rgba(234,88,12,0.08);
+    --accent-bd: rgba(234,88,12,0.25);
+    --red:       #ef4444;
+    --red-lt:    #f87171;
+    --green:     #4ade80;
+    --sidebar-bg:#111113;
+    --pre-bg:    #09090b;
+    --kbd-bg:    #18181b;
+    --kbd-border:#3f3f46;
+    --dot-color: rgba(234,88,12,0.04);
+    --glow:      0 0 20px rgba(234,88,12,0.3);
+  }
+
+  /* ── FORCED LIGHT (overrides system) ───────────────────────────── */
+  :root[data-scheme="light"] {
+    --bg:        #f8fafc;
+    --bg-card:   #ffffff;
+    --border:    #e2e8f0;
+    --border-dim:#f1f5f9;
+    --text:      #1e293b;
+    --text-muted:#64748b;
+    --text-dim:  #94a3b8;
+    --text-vdim: #cbd5e1;
+    --accent:    #14b8a6;
+    --accent-6:  #0d9488;
+    --accent-9:  #134e4a;
+    --accent-bg: rgba(20,184,166,0.08);
+    --accent-bd: rgba(20,184,166,0.25);
+    --red:       #ef4444;
+    --red-lt:    #f87171;
+    --green:     #22c55e;
+    --sidebar-bg:#f1f5f9;
+    --pre-bg:    #f8fafc;
+    --kbd-bg:    #f1f5f9;
+    --kbd-border:#e2e8f0;
+    --dot-color: rgba(20,184,166,0.05);
+    --glow:      none;
+  }
+
+  /* ── SIDEBAR WIDTH VAR ───────────────────────────────────────── */
+  :root { --sidebar-w: 220px; }
+
+  /* ── BASE ─────────────────────────────────────────────────────── */
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    line-height: 1.6;
+    min-height: 100vh;
+    background-image: radial-gradient(circle, var(--dot-color) 1px, transparent 1px);
+    background-size: 30px 30px;
+  }
+
+  /* ── THEME SWITCHER ────────────────────────────────────────────── */
+  .theme-switcher {
+    position: fixed;
+    top: 16px;
+    right: 16px;
+    z-index: 100;
+    display: flex;
+    gap: 6px;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 5px 8px;
+  }
+  .theme-btn {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    border: 2px solid transparent;
+    cursor: pointer;
+    transition: border-color 0.15s, transform 0.1s;
+  }
+  .theme-btn:hover { transform: scale(1.15); }
+  .theme-btn.active { border-color: var(--accent); }
+  .theme-btn[data-s="dark"]  { background: #09090b; outline: 1px solid #3f3f46; outline-offset: 1px; }
+  .theme-btn[data-s="light"] { background: #f8fafc; outline: 1px solid #e2e8f0; outline-offset: 1px; }
+
+  /* ── LAYOUT ───────────────────────────────────────────────────── */
+  .layout { display: flex; min-height: 100vh; }
+
+  /* ── SIDEBAR ──────────────────────────────────────────────────── */
+  .sidebar {
+    position: fixed;
+    top: 0; left: 0;
+    width: var(--sidebar-w);
+    height: 100vh;
+    background: var(--sidebar-bg);
+    border-right: 1px solid var(--border-dim);
+    padding: 28px 0;
+    overflow-y: auto;
+    overflow-x: hidden;
+    z-index: 10;
+    transition: width 0.25s ease, transform 0.25s ease;
+  }
+
+  /* ── COLLAPSED STATE ──────────────────────────────────────────── */
+  body.sidebar-collapsed { --sidebar-w: 0px; }
+  body.sidebar-collapsed .sidebar { border-right: none; }
+
+  /* ── SIDEBAR COLLAPSE BTN (always visible, moves with sidebar) ── */
+  .sidebar-collapse-btn {
+    position: fixed;
+    top: 14px;
+    left: var(--sidebar-w);
+    z-index: 30;
+    width: 28px;
+    height: 28px;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-dim);
+    font-size: 14px;
+    cursor: pointer;
+    transition: left 0.25s ease, color 0.15s, background 0.15s;
+    transform: translateX(8px);
+  }
+  .sidebar-collapse-btn:hover { color: var(--accent); background: var(--accent-bg); }
+
+  /* ── MOBILE HAMBURGER ─────────────────────────────────────────── */
+  .mobile-menu-btn {
+    display: none;
+    position: fixed;
+    top: 14px;
+    left: 14px;
+    z-index: 60;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 7px;
+    width: 36px;
+    height: 36px;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: color 0.15s, background 0.15s;
+  }
+  .mobile-menu-btn:hover { color: var(--accent); background: var(--accent-bg); }
+
+  /* ── MOBILE BACKDROP ──────────────────────────────────────────── */
+  .sidebar-backdrop {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.5);
+    z-index: 40;
+    opacity: 0;
+    transition: opacity 0.25s ease;
+  }
+  .sidebar-backdrop.open { opacity: 1; }
+  .sidebar-logo {
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 900;
+    font-size: 18px;
+    color: var(--accent-6);
+    text-shadow: var(--glow);
+    padding: 0 20px 24px;
+    border-bottom: 1px solid var(--border-dim);
+    display: block;
+    letter-spacing: -0.02em;
+  }
+  .sidebar-sub {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    color: var(--text-dim);
+    font-weight: 400;
+    display: block;
+    margin-top: 3px;
+    letter-spacing: 0.05em;
+  }
+  .nav-section-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    color: var(--text-vdim);
+    padding: 20px 20px 8px;
+  }
+  .nav-link {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 7px 20px;
+    font-size: 13px;
+    color: var(--text-muted);
+    text-decoration: none;
+    transition: color 0.15s, background 0.15s;
+    cursor: pointer;
+  }
+  .nav-link:hover { color: var(--accent); background: var(--accent-bg); }
+  .nav-link .num {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    color: var(--text-vdim);
+    min-width: 16px;
+  }
+
+  /* ── MAIN ─────────────────────────────────────────────────────── */
+  /* ── PAGE HEADER ──────────────────────────────────────────────── */
+  .page-header { margin-bottom: 40px; }
+  .page-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    color: var(--accent);
+    margin-bottom: 10px;
+  }
+  .page-title {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 2.4rem;
+    font-weight: 900;
+    color: var(--accent-6);
+    text-shadow: var(--glow);
+    letter-spacing: -0.02em;
+    line-height: 1;
+    margin-bottom: 10px;
+  }
+  .page-meta {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-top: 12px;
+  }
+  .meta-badge {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--text-muted);
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    padding: 3px 10px;
+  }
+
+  /* ── SECTIONS ─────────────────────────────────────────────────── */
+  .section { margin-bottom: 48px; scroll-margin-top: 24px; }
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 20px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--border-dim);
+  }
+  .section-num {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--accent);
+    background: var(--accent-bg);
+    border: 1px solid var(--accent-bd);
+    border-radius: 5px;
+    padding: 2px 8px;
+    min-width: 32px;
+    text-align: center;
+  }
+  .section-title {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: var(--text);
+  }
+  .new-badge {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: var(--accent);
+    background: var(--accent-bg);
+    border: 1px solid var(--accent-bd);
+    border-radius: 4px;
+    padding: 1px 6px;
+    letter-spacing: 0.1em;
+  }
+
+  /* ── CARDS ────────────────────────────────────────────────────── */
+  .card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 18px 20px;
+    margin-bottom: 14px;
+  }
+  .card-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .card-grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; }
+
+  /* ── TABLES ───────────────────────────────────────────────────── */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+    margin-bottom: 14px;
+  }
+  thead tr { background: var(--sidebar-bg); }
+  th {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--text-dim);
+    padding: 9px 14px;
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+  }
+  td {
+    padding: 9px 14px;
+    border-bottom: 1px solid var(--border-dim);
+    color: var(--text-muted);
+    vertical-align: top;
+  }
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: var(--accent-bg); }
+  td code { color: var(--accent); }
+  .td-green { color: var(--green); }
+  .td-red { color: var(--red-lt); }
+
+  /* ── CODE BLOCKS ──────────────────────────────────────────────── */
+  pre {
+    background: var(--pre-bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 16px 18px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    line-height: 1.8;
+    color: var(--text-muted);
+    overflow-x: auto;
+    margin-bottom: 14px;
+  }
+  .kw  { color: var(--accent); }
+  .fn  { color: var(--accent-6); }
+  .str { color: var(--green); }
+  .cm  { color: var(--text-vdim); }
+  .num { color: #60a5fa; }
+  .tp  { color: #c084fc; }
+
+  /* ── INLINE CODE ──────────────────────────────────────────────── */
+  code {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    background: var(--accent-bg);
+    color: var(--accent);
+    border: 1px solid var(--accent-bd);
+    border-radius: 4px;
+    padding: 1px 5px;
+  }
+
+  /* ── FILE TREE ────────────────────────────────────────────────── */
+  .file-tree {
+    background: var(--pre-bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 16px 18px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    line-height: 2;
+  }
+  .ft-dir  { color: var(--accent); }
+  .ft-file { color: var(--text-muted); }
+  .ft-cm   { color: var(--text-vdim); }
+  .ft-new  { color: var(--accent); font-weight: 700; }
+
+  /* ── FLOW DIAGRAMS ────────────────────────────────────────────── */
+  .flow {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    padding: 16px;
+    background: var(--pre-bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    margin-bottom: 14px;
+  }
+  .flow-state {
+    border-radius: 6px;
+    padding: 5px 12px;
+    font-size: 12px;
+    white-space: nowrap;
+  }
+  .flow-state.idle    { border: 1px solid var(--text-vdim); color: var(--text-dim); }
+  .flow-state.running { border: 1px solid var(--accent-bd); color: var(--accent); background: var(--accent-bg); }
+  .flow-state.paused  { border: 1px solid rgba(239,68,68,0.4); color: var(--red-lt); background: rgba(239,68,68,0.06); }
+  .flow-arrow { color: var(--accent); font-size: 13px; }
+  .flow-label { color: var(--text-dim); font-size: 10px; white-space: nowrap; }
+
+  /* ── COLOR SWATCHES ───────────────────────────────────────────── */
+  .swatches { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 14px; }
+  .swatch { text-align: center; }
+  .swatch-box { width: 100%; height: 44px; border-radius: 7px; margin-bottom: 7px; border: 1px solid var(--border); }
+  .swatch-name { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--text-muted); }
+  .swatch-hex  { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: var(--text-vdim); }
+
+  /* ── KEYBOARD ─────────────────────────────────────────────────── */
+  kbd {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    background: var(--kbd-bg);
+    border: 1px solid var(--kbd-border);
+    border-bottom: 2px solid var(--kbd-border);
+    border-radius: 5px;
+    padding: 2px 7px;
+    color: var(--text-muted);
+  }
+
+  /* ── NOTE / CALLOUT ───────────────────────────────────────────── */
+  .note {
+    background: var(--accent-bg);
+    border-left: 3px solid var(--accent-6);
+    border-radius: 0 7px 7px 0;
+    padding: 10px 14px;
+    font-size: 13px;
+    color: var(--text-muted);
+    margin-bottom: 14px;
+  }
+
+  /* ── MISC ─────────────────────────────────────────────────────── */
+  hr { border: none; border-top: 1px solid var(--border-dim); margin: 32px 0; }
+
+  h3 {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text);
+    margin: 20px 0 10px;
+  }
+
+  ul.spec-list { padding-left: 18px; color: var(--text-muted); line-height: 2; font-size: 13px; }
+  ul.spec-list li strong { color: var(--text); }
+
+  /* ── MAIN TRANSITION ─────────────────────────────────────────── */
+  .main { margin-left: var(--sidebar-w); padding: 48px 48px 80px; max-width: 900px; transition: margin-left 0.25s ease; }
+
+  /* ── RESPONSIVE ───────────────────────────────────────────────── */
+  @media (max-width: 768px) {
+    .sidebar {
+      display: block;
+      transform: translateX(-100%);
+      width: 260px;
+      z-index: 50;
+      transition: transform 0.25s ease;
+    }
+    .sidebar.open { transform: translateX(0); }
+    .sidebar-backdrop { display: block; }
+    .sidebar-collapse-btn { display: none; }
+    .mobile-menu-btn { display: flex; }
+    .main { margin-left: 0; padding: 24px 20px 60px; transition: none; }
+    .card-grid-2, .card-grid-3 { grid-template-columns: 1fr; }
+    .swatches { grid-template-columns: repeat(2, 1fr); }
+  }
+</style>
+</head>
+<body>
+
+<!-- Mobile hamburger -->
+<button class="mobile-menu-btn" onclick="toggleMobileNav()" aria-label="Open menu">☰</button>
+
+<!-- Mobile backdrop -->
+<div class="sidebar-backdrop" id="backdrop" onclick="closeMobileNav()"></div>
+
+<!-- Sidebar collapse/expand btn (desktop, moves with sidebar) -->
+<button class="sidebar-collapse-btn" id="sidebarCollapseBtn" onclick="toggleSidebar()" aria-label="Toggle sidebar">‹</button>
+
+<!-- Theme switcher (top-right) -->
+<div class="theme-switcher">
+  <div class="theme-btn" data-s="dark"  title="Dark"  onclick="setScheme('dark')"></div>
+  <div class="theme-btn" data-s="light" title="Light" onclick="setScheme('light')"></div>
+</div>
+
+<div class="layout">
+
+  <!-- Sidebar -->
+  <nav class="sidebar">
+    <span class="sidebar-logo">
+      Topic Format
+      <span class="sidebar-sub">REFERENCE · v1 · 2026-06-27</span>
+    </span>
+    <div class="nav-section-label">Contents</div>
+    <a class="nav-link" href="#s1"><span class="num">01</span> Shape of the file</a>
+    <a class="nav-link" href="#s2"><span class="num">02</span> Frontmatter</a>
+    <a class="nav-link" href="#s3"><span class="num">03</span> Subtopics</a>
+    <a class="nav-link" href="#s4"><span class="num">04</span> Checklists</a>
+    <a class="nav-link" href="#s5"><span class="num">05</span> Supported markdown</a>
+    <a class="nav-link" href="#s6"><span class="num">06</span> Common errors</a>
+    <a class="nav-link" href="#s7"><span class="num">07</span> Uploading</a>
+  </nav>
+
+  <!-- Main content -->
+  <main class="main">
+
+    <!-- Page header -->
+    <div class="page-header">
+      <div class="page-label">Reference</div>
+      <div class="page-title">Topic Markdown Format</div>
+      <div class="page-meta">
+        <span class="meta-badge">2026-06-27</span>
+        <span class="meta-badge">v1</span>
+        <span class="meta-badge">Author's guide</span>
+      </div>
+    </div>
+
+    <div class="section" id="s1">
+      <div class="section-header"><span class="section-num">01</span><span class="section-title">Shape of the file</span></div>
+      <p>One <code>.md</code> file becomes one topic with any number of subtopics. Upload it from home → <strong>Add topic</strong>.</p>
+      <pre>---
+title: My Topic
+icon: "📦"
+description: One-line summary shown on the card.
+---
+
+# First Subtopic
+
+Theory markdown goes here.
+
+## Checklist
+- [ ] First thing to learn
+- [ ] Second thing to learn
+
+# Second Subtopic
+
+More theory…
+
+## Checklist
+- [ ] Another item</pre>
+    </div>
+
+    <div class="section" id="s2">
+      <div class="section-header"><span class="section-num">02</span><span class="section-title">Frontmatter (topic info)</span></div>
+      <p>A <code>---</code> fenced block at the very top. Flat <code>key: value</code> pairs only.</p>
+      <table>
+        <thead><tr><th>Field</th><th>Required</th><th>Notes</th></tr></thead>
+        <tbody>
+          <tr><td><code>title</code></td><td class="td-green">yes</td><td>The topic name shown on the card and headings.</td></tr>
+          <tr><td><code>icon</code></td><td>no</td><td>A single emoji, e.g. <code>"📦"</code>. Quotes optional.</td></tr>
+          <tr><td><code>description</code></td><td>no</td><td>One-line summary shown on the topic card.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="section" id="s3">
+      <div class="section-header"><span class="section-num">03</span><span class="section-title">Subtopics</span></div>
+      <ul class="spec-list">
+        <li>Every <code>#</code> (H1) heading starts a new subtopic; the heading text is its title.</li>
+        <li>Subtopics appear in the order they're written.</li>
+        <li>A topic needs <strong>at least one</strong> subtopic.</li>
+      </ul>
+    </div>
+
+    <div class="section" id="s4">
+      <div class="section-header"><span class="section-num">04</span><span class="section-title">Checklists</span></div>
+      <p>Inside a subtopic, add a <code>## Checklist</code> heading followed by a task list. Each <code>- [ ]</code> line is one tickable item.</p>
+      <pre>## Checklist
+- [ ] Understand the idea
+- [ ] Do one practice problem</pre>
+      <div class="note">The <code>## Checklist</code> section is removed from the rendered theory so it isn't shown twice — the interactive checklist renders it instead. A subtopic may omit the checklist (it just renders theory).</div>
+    </div>
+
+    <div class="section" id="s5">
+      <div class="section-header"><span class="section-num">05</span><span class="section-title">Supported markdown in the theory</span></div>
+      <p>The body of each subtopic supports the same features as built-in lessons:</p>
+      <ul class="spec-list">
+        <li><strong>Headings</strong> (<code>##</code>–<code>######</code>), bold, italic, lists, tables, links, images.</li>
+        <li><strong>Code blocks</strong> with syntax highlighting (fenced with a language, e.g. <code>js</code>, <code>python</code>).</li>
+        <li><strong>Callouts</strong> — <code>&gt; [!NOTE]</code>, plus <code>[!TIP]</code>, <code>[!WARNING]</code>, <code>[!CAUTION]</code>, <code>[!IMPORTANT]</code>.</li>
+        <li><strong>Diagrams</strong> — a <code>```mermaid</code> fenced block.</li>
+      </ul>
+    </div>
+
+    <div class="section" id="s6">
+      <div class="section-header"><span class="section-num">06</span><span class="section-title">Common errors</span></div>
+      <table>
+        <thead><tr><th>Message</th><th>Fix</th></tr></thead>
+        <tbody>
+          <tr><td class="td-red">Missing <code>title</code> in frontmatter.</td><td>Add a <code>---</code> block at the top with <code>title:</code>.</td></tr>
+          <tr><td class="td-red">No subtopics found…</td><td>Add at least one <code>#</code> H1 heading.</td></tr>
+          <tr><td>Subtopic … has no checklist items.</td><td>Warning only — add a <code>## Checklist</code> if you want tracking.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="section" id="s7">
+      <div class="section-header"><span class="section-num">07</span><span class="section-title">Uploading</span></div>
+      <p>Home → <strong>Add topic</strong> → choose your <code>.md</code> file or paste its contents. A preview shows the topic, its subtopics, and item counts before you confirm.</p>
+      <div class="note">Your uploaded topics are saved in this browser and included in your export/import backup (Stats → Your data). Grab the starter at <code>public/templates/topic-template.md</code> or via the "Download the template" link in the upload dialog.</div>
+    </div>
+
+  </main>
+</div>
+
+<script>
+  function setScheme(s) {
+    document.documentElement.setAttribute('data-scheme', s);
+    document.querySelectorAll('.theme-btn').forEach(b => {
+      b.classList.toggle('active', b.dataset.s === s);
+    });
+    localStorage.setItem('doc-scheme', s);
+  }
+  // Restore saved theme preference
+  const saved = localStorage.getItem('doc-scheme');
+  const preferred = saved || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+  document.documentElement.setAttribute('data-scheme', preferred);
+  document.addEventListener('DOMContentLoaded', () => {
+    document.querySelectorAll('.theme-btn').forEach(b => {
+      b.classList.toggle('active', b.dataset.s === preferred);
+    });
+  });
+
+  // Desktop sidebar collapse
+  function toggleSidebar() {
+    const collapsed = document.body.classList.toggle('sidebar-collapsed');
+    document.getElementById('sidebarCollapseBtn').textContent = collapsed ? '›' : '‹';
+    localStorage.setItem('sidebar-collapsed', collapsed);
+  }
+  if (localStorage.getItem('sidebar-collapsed') === 'true') {
+    document.body.classList.add('sidebar-collapsed');
+    document.getElementById('sidebarCollapseBtn').textContent = '›';
+  }
+
+  // Mobile drawer
+  function toggleMobileNav() {
+    document.querySelector('.sidebar').classList.toggle('open');
+    document.getElementById('backdrop').classList.toggle('open');
+  }
+  function closeMobileNav() {
+    document.querySelector('.sidebar').classList.remove('open');
+    document.getElementById('backdrop').classList.remove('open');
+  }
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeMobileNav(); });
+</script>
+</body>
+</html>

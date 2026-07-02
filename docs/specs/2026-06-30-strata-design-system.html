@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="en" data-scheme="auto">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>STRATA Design System — Design Spec</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700;900&family=JetBrains+Mono:wght@400;700&family=Inter:wght@300;400;500&display=swap" rel="stylesheet"/>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-scheme="light"]) {
+      --bg:        #09090b;
+      --bg-card:   #18181b;
+      --border:    #27272a;
+      --border-dim:#1c1c1f;
+      --text:      #d4d4d8;
+      --text-muted:#71717a;
+      --text-dim:  #52525b;
+      --text-vdim: #3f3f46;
+      --accent:    #f97316;
+      --accent-6:  #ea580c;
+      --accent-9:  #7c2d12;
+      --accent-bg: rgba(234,88,12,0.08);
+      --accent-bd: rgba(234,88,12,0.25);
+      --red:       #ef4444;
+      --red-lt:    #f87171;
+      --green:     #4ade80;
+      --sidebar-bg:#111113;
+      --pre-bg:    #09090b;
+      --kbd-bg:    #18181b;
+      --kbd-border:#3f3f46;
+      --dot-color: rgba(234,88,12,0.04);
+      --glow:      0 0 20px rgba(234,88,12,0.3);
+    }
+  }
+
+  @media (prefers-color-scheme: light) {
+    :root:not([data-scheme="dark"]) {
+      --bg:        #f8fafc;
+      --bg-card:   #ffffff;
+      --border:    #e2e8f0;
+      --border-dim:#f1f5f9;
+      --text:      #1e293b;
+      --text-muted:#64748b;
+      --text-dim:  #94a3b8;
+      --text-vdim: #cbd5e1;
+      --accent:    #14b8a6;
+      --accent-6:  #0d9488;
+      --accent-9:  #134e4a;
+      --accent-bg: rgba(20,184,166,0.08);
+      --accent-bd: rgba(20,184,166,0.25);
+      --red:       #ef4444;
+      --red-lt:    #f87171;
+      --green:     #22c55e;
+      --sidebar-bg:#f1f5f9;
+      --pre-bg:    #f8fafc;
+      --kbd-bg:    #f1f5f9;
+      --kbd-border:#e2e8f0;
+      --dot-color: rgba(20,184,166,0.05);
+      --glow:      none;
+    }
+  }
+
+  :root[data-scheme="dark"] {
+    --bg:        #09090b;
+    --bg-card:   #18181b;
+    --border:    #27272a;
+    --border-dim:#1c1c1f;
+    --text:      #d4d4d8;
+    --text-muted:#71717a;
+    --text-dim:  #52525b;
+    --text-vdim: #3f3f46;
+    --accent:    #f97316;
+    --accent-6:  #ea580c;
+    --accent-9:  #7c2d12;
+    --accent-bg: rgba(234,88,12,0.08);
+    --accent-bd: rgba(234,88,12,0.25);
+    --red:       #ef4444;
+    --red-lt:    #f87171;
+    --green:     #4ade80;
+    --sidebar-bg:#111113;
+    --pre-bg:    #09090b;
+    --kbd-bg:    #18181b;
+    --kbd-border:#3f3f46;
+    --dot-color: rgba(234,88,12,0.04);
+    --glow:      0 0 20px rgba(234,88,12,0.3);
+  }
+
+  :root[data-scheme="light"] {
+    --bg:        #f8fafc;
+    --bg-card:   #ffffff;
+    --border:    #e2e8f0;
+    --border-dim:#f1f5f9;
+    --text:      #1e293b;
+    --text-muted:#64748b;
+    --text-dim:  #94a3b8;
+    --text-vdim: #cbd5e1;
+    --accent:    #14b8a6;
+    --accent-6:  #0d9488;
+    --accent-9:  #134e4a;
+    --accent-bg: rgba(20,184,166,0.08);
+    --accent-bd: rgba(20,184,166,0.25);
+    --red:       #ef4444;
+    --red-lt:    #f87171;
+    --green:     #22c55e;
+    --sidebar-bg:#f1f5f9;
+    --pre-bg:    #f8fafc;
+    --kbd-bg:    #f1f5f9;
+    --kbd-border:#e2e8f0;
+    --dot-color: rgba(20,184,166,0.05);
+    --glow:      none;
+  }
+
+  :root { --sidebar-w: 220px; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    line-height: 1.6;
+    min-height: 100vh;
+    background-image: radial-gradient(circle, var(--dot-color) 1px, transparent 1px);
+    background-size: 30px 30px;
+  }
+
+  .theme-switcher {
+    position: fixed; top: 16px; right: 16px; z-index: 100;
+    display: flex; gap: 6px;
+    background: var(--bg-card); border: 1px solid var(--border);
+    border-radius: 8px; padding: 5px 8px;
+  }
+  .theme-btn {
+    width: 20px; height: 20px; border-radius: 50%;
+    border: 2px solid transparent; cursor: pointer;
+    transition: border-color 0.15s, transform 0.1s;
+  }
+  .theme-btn:hover { transform: scale(1.15); }
+  .theme-btn.active { border-color: var(--accent); }
+  .theme-btn[data-s="dark"]  { background: #09090b; outline: 1px solid #3f3f46; outline-offset: 1px; }
+  .theme-btn[data-s="light"] { background: #f8fafc; outline: 1px solid #e2e8f0; outline-offset: 1px; }
+
+  .layout { display: flex; min-height: 100vh; }
+
+  .sidebar {
+    position: fixed; top: 0; left: 0; width: var(--sidebar-w); height: 100vh;
+    background: var(--sidebar-bg); border-right: 1px solid var(--border-dim);
+    padding: 28px 0; overflow-y: auto; overflow-x: hidden; z-index: 10;
+    transition: width 0.25s ease, transform 0.25s ease;
+  }
+
+  body.sidebar-collapsed { --sidebar-w: 0px; }
+  body.sidebar-collapsed .sidebar { border-right: none; }
+
+  .sidebar-collapse-btn {
+    position: fixed; top: 14px; left: var(--sidebar-w); z-index: 30;
+    width: 28px; height: 28px; background: var(--bg-card);
+    border: 1px solid var(--border); border-radius: 6px;
+    display: flex; align-items: center; justify-content: center;
+    color: var(--text-dim); font-size: 14px; cursor: pointer;
+    transition: left 0.25s ease, color 0.15s, background 0.15s;
+    transform: translateX(8px);
+  }
+  .sidebar-collapse-btn:hover { color: var(--accent); background: var(--accent-bg); }
+
+  .mobile-menu-btn {
+    display: none; position: fixed; top: 14px; left: 14px; z-index: 60;
+    background: var(--bg-card); border: 1px solid var(--border); border-radius: 7px;
+    width: 36px; height: 36px; align-items: center; justify-content: center;
+    font-size: 16px; color: var(--text-muted); cursor: pointer;
+    transition: color 0.15s, background 0.15s;
+  }
+  .mobile-menu-btn:hover { color: var(--accent); background: var(--accent-bg); }
+
+  .sidebar-backdrop {
+    display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5);
+    z-index: 40; opacity: 0; transition: opacity 0.25s ease;
+  }
+  .sidebar-backdrop.open { opacity: 1; }
+  .sidebar-logo {
+    font-family: 'Space Grotesk', sans-serif; font-weight: 900; font-size: 18px;
+    color: var(--accent-6); text-shadow: var(--glow);
+    padding: 0 20px 24px; border-bottom: 1px solid var(--border-dim);
+    display: block; letter-spacing: -0.02em;
+  }
+  .sidebar-sub {
+    font-family: 'JetBrains Mono', monospace; font-size: 9px; color: var(--text-dim);
+    font-weight: 400; display: block; margin-top: 3px; letter-spacing: 0.05em;
+  }
+  .nav-section-label {
+    font-family: 'JetBrains Mono', monospace; font-size: 9px; font-weight: 700;
+    text-transform: uppercase; letter-spacing: 0.15em; color: var(--text-vdim);
+    padding: 20px 20px 8px;
+  }
+  .nav-link {
+    display: flex; align-items: center; gap: 10px; padding: 7px 20px;
+    font-size: 13px; color: var(--text-muted); text-decoration: none;
+    transition: color 0.15s, background 0.15s; cursor: pointer;
+  }
+  .nav-link:hover { color: var(--accent); background: var(--accent-bg); }
+  .nav-link .num {
+    font-family: 'JetBrains Mono', monospace; font-size: 10px;
+    color: var(--text-vdim); min-width: 16px;
+  }
+
+  .page-header { margin-bottom: 40px; }
+  .page-label {
+    font-family: 'JetBrains Mono', monospace; font-size: 10px; font-weight: 700;
+    text-transform: uppercase; letter-spacing: 0.2em; color: var(--accent);
+    margin-bottom: 10px;
+  }
+  .page-title {
+    font-family: 'Space Grotesk', sans-serif; font-size: 2.4rem; font-weight: 900;
+    color: var(--accent-6); text-shadow: var(--glow); letter-spacing: -0.02em;
+    line-height: 1; margin-bottom: 10px;
+  }
+  .page-meta { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 12px; }
+  .meta-badge {
+    font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--text-muted);
+    background: var(--bg-card); border: 1px solid var(--border); border-radius: 5px;
+    padding: 3px 10px;
+  }
+
+  .section { margin-bottom: 48px; scroll-margin-top: 24px; }
+  .section-header {
+    display: flex; align-items: center; gap: 12px; margin-bottom: 20px;
+    padding-bottom: 12px; border-bottom: 1px solid var(--border-dim);
+  }
+  .section-num {
+    font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 700;
+    color: var(--accent); background: var(--accent-bg); border: 1px solid var(--accent-bd);
+    border-radius: 5px; padding: 2px 8px; min-width: 32px; text-align: center;
+  }
+  .section-title {
+    font-family: 'Space Grotesk', sans-serif; font-size: 1.15rem; font-weight: 700; color: var(--text);
+  }
+
+  .card {
+    background: var(--bg-card); border: 1px solid var(--border); border-radius: 10px;
+    padding: 18px 20px; margin-bottom: 14px;
+  }
+  .card-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+
+  table { width: 100%; border-collapse: collapse; font-size: 13px; margin-bottom: 14px; }
+  thead tr { background: var(--sidebar-bg); }
+  th {
+    font-family: 'JetBrains Mono', monospace; font-size: 10px; font-weight: 700;
+    text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-dim);
+    padding: 9px 14px; text-align: left; border-bottom: 1px solid var(--border);
+  }
+  td { padding: 9px 14px; border-bottom: 1px solid var(--border-dim); color: var(--text-muted); vertical-align: top; }
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: var(--accent-bg); }
+  td code { color: var(--accent); }
+
+  pre {
+    background: var(--pre-bg); border: 1px solid var(--border); border-radius: 8px;
+    padding: 16px 18px; font-family: 'JetBrains Mono', monospace; font-size: 12px;
+    line-height: 1.8; color: var(--text-muted); overflow-x: auto; margin-bottom: 14px;
+  }
+  .kw  { color: var(--accent); }
+  .fn  { color: var(--accent-6); }
+  .str { color: var(--green); }
+  .cm  { color: var(--text-vdim); }
+
+  code {
+    font-family: 'JetBrains Mono', monospace; font-size: 12px;
+    background: var(--accent-bg); color: var(--accent);
+    border: 1px solid var(--accent-bd); border-radius: 4px; padding: 1px 5px;
+  }
+
+  .swatches { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 14px; }
+  .swatch { text-align: center; }
+  .swatch-box { width: 100%; height: 44px; border-radius: 7px; margin-bottom: 7px; border: 1px solid var(--border); }
+  .swatch-name { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--text-muted); }
+  .swatch-hex  { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: var(--text-vdim); }
+
+  .note {
+    background: var(--accent-bg); border-left: 3px solid var(--accent-6);
+    border-radius: 0 7px 7px 0; padding: 10px 14px; font-size: 13px;
+    color: var(--text-muted); margin-bottom: 14px;
+  }
+
+  hr { border: none; border-top: 1px solid var(--border-dim); margin: 32px 0; }
+  h3 { font-family: 'Space Grotesk', sans-serif; font-size: 14px; font-weight: 600; color: var(--text); margin: 20px 0 10px; }
+  ul.spec-list { padding-left: 18px; color: var(--text-muted); line-height: 2; font-size: 13px; }
+  ul.spec-list li strong { color: var(--text); }
+
+  .main { margin-left: var(--sidebar-w); padding: 48px 48px 80px; max-width: 900px; transition: margin-left 0.25s ease; }
+
+  @media (max-width: 768px) {
+    .sidebar { display: block; transform: translateX(-100%); width: 260px; z-index: 50; transition: transform 0.25s ease; }
+    .sidebar.open { transform: translateX(0); }
+    .sidebar-backdrop { display: block; }
+    .sidebar-collapse-btn { display: none; }
+    .mobile-menu-btn { display: flex; }
+    .main { margin-left: 0; padding: 24px 20px 60px; transition: none; }
+    .card-grid-2 { grid-template-columns: 1fr; }
+    .swatches { grid-template-columns: repeat(2, 1fr); }
+  }
+</style>
+</head>
+<body>
+
+<button class="mobile-menu-btn" onclick="toggleMobileNav()" aria-label="Open menu">☰</button>
+<div class="sidebar-backdrop" id="backdrop" onclick="closeMobileNav()"></div>
+<button class="sidebar-collapse-btn" id="sidebarCollapseBtn" onclick="toggleSidebar()" aria-label="Toggle sidebar">‹</button>
+
+<div class="theme-switcher">
+  <div class="theme-btn" data-s="dark"  title="Dark"  onclick="setScheme('dark')"></div>
+  <div class="theme-btn" data-s="light" title="Light" onclick="setScheme('light')"></div>
+</div>
+
+<div class="layout">
+
+  <nav class="sidebar">
+    <span class="sidebar-logo">
+      STRATA
+      <span class="sidebar-sub">Design Spec · 1.0.0 · 2026-06-30</span>
+    </span>
+    <div class="nav-section-label">Contents</div>
+    <a class="nav-link" href="#s1"><span class="num">01</span> Overview</a>
+    <a class="nav-link" href="#s2"><span class="num">02</span> Tokens</a>
+    <a class="nav-link" href="#s3"><span class="num">03</span> Typography &amp; CSS</a>
+    <a class="nav-link" href="#s4"><span class="num">04</span> Component mapping</a>
+    <a class="nav-link" href="#s5"><span class="num">05</span> Icons</a>
+    <a class="nav-link" href="#s6"><span class="num">06</span> Cleanup</a>
+    <a class="nav-link" href="#s7"><span class="num">07</span> Verification</a>
+  </nav>
+
+  <main class="main">
+
+    <div class="page-header">
+      <div class="page-label">Design Spec</div>
+      <div class="page-title">STRATA Design System</div>
+      <div class="page-meta">
+        <span class="meta-badge">LevelUp</span>
+        <span class="meta-badge">Astro 7 · Svelte 5 · Tailwind v4</span>
+        <span class="meta-badge">2026-06-30</span>
+      </div>
+    </div>
+
+    <div class="section" id="s1">
+      <div class="section-header"><span class="section-num">01</span><span class="section-title">Overview</span></div>
+      <p style="color:var(--text-muted); margin-bottom:14px;">
+        Adopt STRATA (source: <code>strata-design-system/tokens.ts</code>, <code>design-system.md</code>, <code>StudyTracker.jsx</code>)
+        as LevelUp's design system, replacing the current emerald/amber light+dark Tailwind theme entirely. STRATA is a
+        dark-only "field research console" aesthetic: near-black instrument panel, status dots instead of checkboxes,
+        IBM Plex Mono for all data/numbers, Fraunces used sparingly for section titles only, and a stamp-in
+        micro-animation on checklist completion.
+      </p>
+      <div class="note">Decisions locked during brainstorming — see list below. Each was confirmed by the user before this spec was written.</div>
+      <ul class="spec-list">
+        <li><strong>Dark-only.</strong> No light mode, no <code>dark:</code> variant anywhere.</li>
+        <li><strong>STRATA's color semantics fully adopted</strong> — amber = active/in-progress/primary; emerald = complete-only.</li>
+        <li><strong>Visual only</strong> — existing LevelUp terminology (Topics, Lessons, Rewards, Badges) is unchanged.</li>
+        <li><strong>Scope: foundation + full restyle</strong> in one pass, ~33 components.</li>
+        <li><strong>Architecture:</strong> Tailwind v4 <code>@theme</code> tokens drive all utilities, minimal global.css.</li>
+        <li><strong>Fonts:</strong> static <code>&lt;link&gt;</code> in Base.astro head, no runtime JS.</li>
+        <li><strong>PWA icons regenerated</strong> in this pass via existing script.</li>
+        <li><strong>ThemeToggle.svelte removed</strong>; <code>theme</code> field stays inert in AppData.</li>
+      </ul>
+    </div>
+
+    <div class="section" id="s2">
+      <div class="section-header"><span class="section-num">02</span><span class="section-title">Token architecture</span></div>
+      <h3>Primitives</h3>
+      <div class="swatches">
+        <div class="swatch"><div class="swatch-box" style="background:#0B0F14;"></div><div class="swatch-name">slate-950</div><div class="swatch-hex">#0B0F14</div></div>
+        <div class="swatch"><div class="swatch-box" style="background:#121822;"></div><div class="swatch-name">slate-900</div><div class="swatch-hex">#121822</div></div>
+        <div class="swatch"><div class="swatch-box" style="background:#1A2230;"></div><div class="swatch-name">slate-850</div><div class="swatch-hex">#1A2230</div></div>
+        <div class="swatch"><div class="swatch-box" style="background:#232C3A;"></div><div class="swatch-name">slate-800</div><div class="swatch-hex">#232C3A</div></div>
+        <div class="swatch"><div class="swatch-box" style="background:#76869C;"></div><div class="swatch-name">slate-400</div><div class="swatch-hex">#76869C</div></div>
+        <div class="swatch"><div class="swatch-box" style="background:#CFD8E3;"></div><div class="swatch-name">slate-200</div><div class="swatch-hex">#CFD8E3</div></div>
+        <div class="swatch"><div class="swatch-box" style="background:#F5A623;"></div><div class="swatch-name">amber-500</div><div class="swatch-hex">#F5A623</div></div>
+        <div class="swatch"><div class="swatch-box" style="background:#3A2B12;"></div><div class="swatch-name">amber-950</div><div class="swatch-hex">#3A2B12</div></div>
+        <div class="swatch"><div class="swatch-box" style="background:#2DD4BF;"></div><div class="swatch-name">teal-400</div><div class="swatch-hex">#2DD4BF</div></div>
+        <div class="swatch"><div class="swatch-box" style="background:#34D399;"></div><div class="swatch-name">emerald-400</div><div class="swatch-hex">#34D399</div></div>
+        <div class="swatch"><div class="swatch-box" style="background:#F43F5E;"></div><div class="swatch-name">rose-500</div><div class="swatch-hex">#F43F5E</div></div>
+        <div class="swatch"><div class="swatch-box" style="background:#ECE4D3;"></div><div class="swatch-name">paper-100</div><div class="swatch-hex">#ECE4D3</div></div>
+      </div>
+
+      <h3>Semantic tokens</h3>
+      <table>
+        <thead><tr><th>Token</th><th>References</th><th>Usage</th></tr></thead>
+        <tbody>
+          <tr><td><code>--color-ink</code></td><td>slate-950</td><td>Page background</td></tr>
+          <tr><td><code>--color-panel</code></td><td>slate-900</td><td>Card/surface background</td></tr>
+          <tr><td><code>--color-panel-soft</code></td><td>slate-850</td><td>Row hover background</td></tr>
+          <tr><td><code>--color-line</code></td><td>slate-800</td><td>All hairline borders</td></tr>
+          <tr><td><code>--color-text-primary</code></td><td>slate-200</td><td>Body text</td></tr>
+          <tr><td><code>--color-text-muted</code></td><td>slate-400</td><td>Labels, secondary text</td></tr>
+          <tr><td><code>--color-active</code></td><td>amber-500</td><td>In-progress, buttons, XP, focus ring, progress fill</td></tr>
+          <tr><td><code>--color-active-soft</code></td><td>amber-950</td><td>Unlocked badge/patch fill</td></tr>
+          <tr><td><code>--color-complete</code></td><td>emerald-400</td><td>"Complete" state — never reused</td></tr>
+          <tr><td><code>--color-info</code></td><td>teal-400</td><td>Secondary/informational signal</td></tr>
+          <tr><td><code>--color-urgency</code></td><td>rose-500</td><td>Streak indicator</td></tr>
+          <tr><td><code>--color-paper</code></td><td>paper-100</td><td>Rare field-note accent</td></tr>
+        </tbody>
+      </table>
+
+      <h3>Typography &amp; spacing tokens</h3>
+      <pre><span class="kw">--font-display</span>: <span class="str">"Fraunces", Georgia, serif</span>;   <span class="cm">/* section titles, rank callouts only */</span>
+<span class="kw">--font-body</span>:    <span class="str">"Inter", system-ui, sans-serif</span>; <span class="cm">/* all prose */</span>
+<span class="kw">--font-data</span>:    <span class="str">"IBM Plex Mono", ui-monospace, monospace</span>; <span class="cm">/* mandatory for numbers/code/status */</span>
+
+<span class="kw">--spacing-xs</span>: 4px;  <span class="kw">--spacing-sm</span>: 8px;  <span class="kw">--spacing-md</span>: 16px;  <span class="kw">--spacing-lg</span>: 24px;  <span class="kw">--spacing-xl</span>: 40px;
+<span class="kw">--radius-sm</span>: 6px;   <span class="kw">--radius-md</span>: 10px;  <span class="kw">--radius-lg</span>: 14px;
+<span class="kw">--duration-fast</span>: 200ms ease-out;
+<span class="kw">--duration-stamp</span>: 260ms cubic-bezier(0.34, 1.56, 0.64, 1);</pre>
+    </div>
+
+    <div class="section" id="s3">
+      <div class="section-header"><span class="section-num">03</span><span class="section-title">Typography &amp; global CSS</span></div>
+      <h3>Font loading (Base.astro head, static link)</h3>
+      <pre>&lt;<span class="fn">link</span> rel=<span class="str">"preconnect"</span> href=<span class="str">"https://fonts.googleapis.com"</span> /&gt;
+&lt;<span class="fn">link</span> rel=<span class="str">"preconnect"</span> href=<span class="str">"https://fonts.gstatic.com"</span> crossorigin /&gt;
+&lt;<span class="fn">link</span> href=<span class="str">"https://fonts.googleapis.com/css2?family=Fraunces:wght@600&amp;family=Inter:wght@400;500;600&amp;family=IBM+Plex+Mono:wght@400;600&amp;display=swap"</span> rel=<span class="str">"stylesheet"</span> /&gt;</pre>
+
+      <h3>global.css changes</h3>
+      <ul class="spec-list">
+        <li>Remove <code>@custom-variant dark</code> entirely; drop every <code>dark:</code> prefix across all components.</li>
+        <li><code>body</code> → <code>bg-ink text-text-primary font-body antialiased</code>, no conditional branch.</li>
+        <li>Stamp-in keyframe ported from STRATA, plus a <code>prefers-reduced-motion</code> override disabling it and all row/patch hover transitions.</li>
+        <li>Global <code>:focus-visible</code> ring always on: <code>outline: 2px solid var(--color-active)</code>.</li>
+        <li>Lesson <code>.prose</code> override: headings use <code>font-display</code>, body stays <code>font-body</code>, code/pre use <code>font-data</code>.</li>
+        <li>Shiki switches from dual-theme to single dark theme: <code>github-dark-default</code>.</li>
+        <li>Markdown callouts remap: tip→amber, note→teal, important→teal (bold), warning→amber (bold), caution→rose.</li>
+        <li>Mermaid <code>themeVariables</code> overridden to use panel/line/text-primary instead of default light theme.</li>
+      </ul>
+    </div>
+
+    <div class="section" id="s4">
+      <div class="section-header"><span class="section-num">04</span><span class="section-title">Component mapping</span></div>
+      <h3>Shared primitives</h3>
+      <ul class="spec-list">
+        <li><strong>Status dot</strong> — open circle (line) = not-started, filled amber = in-progress, emerald check = complete.</li>
+        <li><strong>Card</strong> — <code>bg-panel border border-line rounded-md</code>, no shadows.</li>
+        <li><strong>Row</strong> — <code>bg-transparent hover:bg-panel-soft</code>, real <code>&lt;button&gt;</code>.</li>
+        <li><strong>Stat block</strong> — mono muted uppercase label + mono semantic-colored value.</li>
+        <li><strong>Patch</strong> — locked: 50% opacity, panel-soft/line. Unlocked: full opacity, amber-soft/amber.</li>
+        <li><strong>Progress bar</strong> — track line, fill amber, flips to emerald only at 100%.</li>
+      </ul>
+
+      <h3>Per-component changes</h3>
+      <table>
+        <thead><tr><th>Component</th><th>Change</th></tr></thead>
+        <tbody>
+          <tr><td><code>TopicCard.astro</code> / <code>TopicProgress.svelte</code></td><td>Mission-row: status dot, title, mono done/total</td></tr>
+          <tr><td><code>LessonRow.astro</code></td><td>Objective-row: mono sequence number, status glyph, title, mono metadata</td></tr>
+          <tr><td><code>Checklist.svelte</code> / <code>ChecklistItem.svelte</code></td><td>Row pattern + status glyph + stamp-in on check</td></tr>
+          <tr><td><code>CoinBalance.svelte</code> / <code>LevelMeter.svelte</code></td><td>Stat-block pattern, mono amber values</td></tr>
+          <tr><td><code>DailyGoal.svelte</code> / <code>StatsSummary.svelte</code></td><td>Telemetry stat-block grid</td></tr>
+          <tr><td><code>RewardShop.svelte</code> / <code>RewardRow.svelte</code> / <code>RedemptionList.svelte</code></td><td>Row pattern, mono coin/rupiah values</td></tr>
+          <tr><td><code>BadgeList.svelte</code> / <code>BadgeTile.svelte</code></td><td>Patch pattern</td></tr>
+          <tr><td><code>Toast.svelte</code> / <code>Confetti.svelte</code></td><td>Recolor only, logic unchanged</td></tr>
+          <tr><td>Search/Notes/DataMenu/RewardEditor/UploadTopicModal/UserTopic*</td><td>Inputs panel/line, amber focus; modals panel/line surfaces</td></tr>
+          <tr><td><code>SiteHeader.astro</code></td><td>Mono eyebrow + app name, coin/level stat block on right</td></tr>
+          <tr><td><code>ThemeToggle.svelte</code></td><td>Deleted</td></tr>
+          <tr><td><code>ThemeScript.astro</code></td><td>Deleted</td></tr>
+          <tr><td><code>LessonDrawer.svelte</code> / <code>RoadmapLinks.svelte</code></td><td>Restyled to panel/line/mono</td></tr>
+          <tr><td><code>ProgressBar.svelte</code></td><td>Token swap only</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="section" id="s5">
+      <div class="section-header"><span class="section-num">05</span><span class="section-title">Icons</span></div>
+      <p style="color:var(--text-muted); margin-bottom:14px;">
+        <code>public/favicon.svg</code> and <code>scripts/gen-icons.mjs</code> both render an emerald rounded-square
+        with a white "L" glyph. Recolor background <code>#059669</code>→<code>#0B0F14</code>, glyph
+        <code>#ffffff</code>→<code>#F5A623</code>, then rerun <code>node scripts/gen-icons.mjs</code> to regenerate
+        all 4 PNGs. Maskable safe zone unaffected — glyph already centered.
+      </p>
+      <ul class="spec-list">
+        <li><code>theme-color</code> meta in Base.astro: <code>#059669</code> → <code>#0B0F14</code></li>
+        <li>PWA manifest theme/background colors (astro.config.mjs) → ink</li>
+      </ul>
+    </div>
+
+    <div class="section" id="s6">
+      <div class="section-header"><span class="section-num">06</span><span class="section-title">Cleanup list</span></div>
+      <ul class="spec-list">
+        <li>Delete <code>ThemeToggle.svelte</code>, remove usage from <code>SiteHeader.astro</code></li>
+        <li>Delete <code>ThemeScript.astro</code> (no-flash logic unneeded, single theme)</li>
+        <li>Strip every <code>dark:</code> prefix across all components</li>
+        <li>Remove old <code>--color-primary-*</code> / <code>--color-coin-*</code> tokens</li>
+        <li><code>theme</code> field stays inert in AppData, no migration bump</li>
+      </ul>
+    </div>
+
+    <div class="section" id="s7">
+      <div class="section-header"><span class="section-num">07</span><span class="section-title">Verification plan</span></div>
+      <ul class="spec-list">
+        <li><code>pnpm build</code> clean, zero errors</li>
+        <li>Visual pass on every route + search/upload modals + lesson drawer</li>
+        <li>Status-dot / patch / stamp-in motion check on real checklist toggle</li>
+        <li><code>prefers-reduced-motion</code> disables stamp-in + hover transitions</li>
+        <li>Contrast check: text-muted and text-primary against panel/ink (WCAG AA)</li>
+        <li>PWA install prompt shows new icon set</li>
+        <li>Pagefind, Mermaid, Shiki render correctly dark-only</li>
+      </ul>
+    </div>
+
+  </main>
+</div>
+
+<script>
+  function setScheme(s) {
+    document.documentElement.setAttribute('data-scheme', s);
+    document.querySelectorAll('.theme-btn').forEach(b => {
+      b.classList.toggle('active', b.dataset.s === s);
+    });
+    localStorage.setItem('doc-scheme', s);
+  }
+  const saved = localStorage.getItem('doc-scheme');
+  const preferred = saved || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+  document.documentElement.setAttribute('data-scheme', preferred);
+  document.addEventListener('DOMContentLoaded', () => {
+    document.querySelectorAll('.theme-btn').forEach(b => {
+      b.classList.toggle('active', b.dataset.s === preferred);
+    });
+  });
+
+  function toggleSidebar() {
+    const collapsed = document.body.classList.toggle('sidebar-collapsed');
+    document.getElementById('sidebarCollapseBtn').textContent = collapsed ? '›' : '‹';
+    localStorage.setItem('sidebar-collapsed', collapsed);
+  }
+  if (localStorage.getItem('sidebar-collapsed') === 'true') {
+    document.body.classList.add('sidebar-collapsed');
+    document.getElementById('sidebarCollapseBtn').textContent = '›';
+  }
+
+  function toggleMobileNav() {
+    document.querySelector('.sidebar').classList.toggle('open');
+    document.getElementById('backdrop').classList.toggle('open');
+  }
+  function closeMobileNav() {
+    document.querySelector('.sidebar').classList.remove('open');
+    document.getElementById('backdrop').classList.remove('open');
+  }
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeMobileNav(); });
+</script>
+</body>
+</html>

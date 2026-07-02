@@ -1,0 +1,33 @@
+---
+import { getCollection } from "astro:content";
+import Base from "../../../layouts/Base.astro";
+import LessonRow from "../../../components/LessonRow.astro";
+import { getTopics } from "../../../lib/content";
+
+export async function getStaticPaths() {
+  const topics = await getCollection("topics");
+  return topics.map((t) => ({ params: { topic: t.id }, props: { topicId: t.id } }));
+}
+
+const { topicId } = Astro.props;
+const topics = await getTopics();
+const topic = topics.find((t) => t.slug === topicId)!;
+---
+<Base title={topic.title} description={topic.description}>
+  <a href="/" class="text-sm font-medium text-active hover:underline">
+    ← All topics
+  </a>
+  <h1 class="mt-3 flex items-center gap-2 text-2xl font-semibold text-text-primary">
+    {topic.icon && <span>{topic.icon}</span>}
+    {topic.title}
+  </h1>
+  <p class="mt-1 text-text-muted">{topic.description}</p>
+
+  <ul class="mt-6 space-y-2">
+    {topic.lessons.map((lesson) => (
+      <li>
+        <LessonRow topicSlug={topic.slug} lesson={lesson} />
+      </li>
+    ))}
+  </ul>
+</Base>

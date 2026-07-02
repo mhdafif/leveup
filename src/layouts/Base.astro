@@ -1,0 +1,46 @@
+---
+import "../styles/global.css";
+import SiteHeader from "../components/SiteHeader.astro";
+import Confetti from "../components/Confetti.svelte";
+import Toast from "../components/Toast.svelte";
+import SearchModal from "../components/SearchModal.svelte";
+
+interface Props {
+  title?: string;
+  description?: string;
+}
+const { title = "LevelUp", description = "Track your learning, level up." } =
+  Astro.props;
+const fullTitle = title === "LevelUp" ? title : `${title} · LevelUp`;
+// PWA assets only exist in the production build; skip them in dev.
+const isProd = import.meta.env.PROD;
+---
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content={description} />
+    <meta name="theme-color" content="#0B0F14" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png" />
+    {isProd && <link rel="manifest" href="/manifest.webmanifest" />}
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Fraunces:wght@600&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;600&display=swap"
+      rel="stylesheet"
+    />
+    <title>{fullTitle}</title>
+    {isProd && <script is:inline src="/registerSW.js"></script>}
+  </head>
+  <body class="min-h-dvh">
+    <SiteHeader />
+    <main class="mx-auto max-w-5xl px-4 py-6">
+      <slot />
+    </main>
+    <Confetti client:idle />
+    <Toast client:idle />
+    <SearchModal client:idle />
+  </body>
+</html>

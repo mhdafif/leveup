@@ -1,0 +1,26 @@
+---
+import Base from "../layouts/Base.astro";
+import StatsSummary from "../components/StatsSummary.svelte";
+import DailyGoal from "../components/DailyGoal.svelte";
+import BadgeList from "../components/BadgeList.svelte";
+import DataMenu from "../components/DataMenu.svelte";
+import { getTopics } from "../lib/content";
+
+const topics = (await getTopics()).map((t) => ({
+  slug: t.slug,
+  lessons: t.lessons.map((l) => ({ slug: l.slug, checklistLen: l.checklistLen })),
+}));
+---
+<Base title="Stats" description="Your learning progress at a glance.">
+  <h1 class="text-2xl font-semibold text-text-primary">Your stats</h1>
+  <p class="mt-1 text-text-muted">
+    Everything you've earned so far.
+  </p>
+
+  <div class="mt-6 flex flex-col gap-4">
+    <StatsSummary topics={topics} client:load />
+    <DailyGoal client:load />
+    <BadgeList client:load />
+    <DataMenu client:load />
+  </div>
+</Base>

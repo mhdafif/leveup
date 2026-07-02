@@ -1,0 +1,28 @@
+---
+import TopicProgress from "./TopicProgress.svelte";
+import type { TopicMeta } from "../lib/types";
+
+interface Props {
+  topic: TopicMeta;
+}
+const { topic } = Astro.props;
+const lessons = topic.lessons.map((l) => ({ slug: l.slug, checklistLen: l.checklistLen }));
+---
+<a
+  href={`/topics/${topic.slug}`}
+  class="row-hover block rounded-md border border-line bg-panel p-5 transition hover:bg-panel-soft"
+>
+  <div class="flex items-center gap-2">
+    {topic.icon && <span class="text-xl">{topic.icon}</span>}
+    <h2 class="text-lg font-semibold text-text-primary">{topic.title}</h2>
+  </div>
+  <p class="mt-1 line-clamp-2 text-sm text-text-muted">
+    {topic.description}
+  </p>
+  <div class="mt-4">
+    <TopicProgress topic={topic.slug} lessons={lessons} client:load />
+  </div>
+  <p class="mt-2 font-data text-xs text-text-muted">
+    {topic.lessons.length} subtopic{topic.lessons.length === 1 ? "" : "s"}
+  </p>
+</a>

@@ -1,0 +1,69 @@
+---
+import CoinBalance from "./CoinBalance.svelte";
+import HeaderFocusTimer from "./HeaderFocusTimer.svelte";
+
+// Top navigation bar. Coin balance is the only interactive island here.
+const links = [
+  { href: "/", label: "Topics" },
+  { href: "/review", label: "Review" },
+  { href: "/rewards", label: "Rewards" },
+  { href: "/stats", label: "Stats" },
+];
+const path = Astro.url.pathname;
+const isActive = (href: string) =>
+  href === "/" ? path === "/" : path.startsWith(href);
+
+const searchBtnClass =
+  "row-hover rounded-md px-3 py-1.5 text-sm font-medium whitespace-nowrap text-text-muted hover:text-text-primary transition";
+---
+<header class="sticky top-0 z-40 border-b border-line bg-ink/95 backdrop-blur">
+  <div class="mx-auto flex max-w-5xl items-center gap-4 px-4 py-3">
+    <a href="/" class="flex items-center gap-2">
+      <span class="grid h-7 w-7 place-items-center rounded-md bg-ink text-sm font-data text-active">L</span>
+      <span class="font-data text-[11px] tracking-widest text-text-muted uppercase">LevelUp</span>
+    </a>
+    <nav class="ml-2 hidden gap-1 sm:flex">
+      {links.map((l) => (
+        <a
+          href={l.href}
+          class:list={[
+            "row-hover rounded-md px-3 py-1.5 text-sm font-medium transition",
+            isActive(l.href)
+              ? "bg-active-soft text-active"
+              : "text-text-muted hover:text-text-primary",
+          ]}
+        >
+          {l.label}
+        </a>
+      ))}
+      <button type="button" data-search-trigger class={searchBtnClass}>Search</button>
+    </nav>
+    <div class="ml-auto flex items-center gap-2">
+      <HeaderFocusTimer client:load />
+      <CoinBalance client:load />
+    </div>
+  </div>
+  <nav class="flex gap-1 overflow-x-auto border-t border-line px-2 py-1.5 sm:hidden">
+    {links.map((l) => (
+      <a
+        href={l.href}
+        class:list={[
+          "row-hover rounded-md px-3 py-1.5 text-sm font-medium whitespace-nowrap transition",
+          isActive(l.href) ? "bg-active-soft text-active" : "text-text-muted",
+        ]}
+      >
+        {l.label}
+      </a>
+    ))}
+    <button type="button" data-search-trigger class={searchBtnClass}>Search</button>
+  </nav>
+</header>
+
+<script>
+  // Open the global search modal (mounted in the layout) from the header buttons.
+  document.querySelectorAll("[data-search-trigger]").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      window.dispatchEvent(new CustomEvent("levelup:open-search"));
+    });
+  });
+</script>

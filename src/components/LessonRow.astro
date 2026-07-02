@@ -1,0 +1,30 @@
+---
+import LessonProgress from "./LessonProgress.svelte";
+import type { LessonMeta } from "../lib/types";
+
+interface Props {
+  topicSlug: string;
+  lesson: LessonMeta;
+}
+const { topicSlug, lesson } = Astro.props;
+---
+<a
+  href={`/topics/${topicSlug}/${lesson.slug}`}
+  class="row-hover block rounded-md border border-line bg-panel px-4 py-3 transition hover:bg-panel-soft"
+>
+  <div class="flex items-center justify-between gap-3">
+    <span class="font-medium text-text-primary">{lesson.title}</span>
+    <span class="shrink-0 font-data text-xs text-text-muted">
+      {lesson.difficulty && <span class="capitalize">{lesson.difficulty}</span>}
+      {lesson.estMinutes && <span> · {lesson.estMinutes} min</span>}
+    </span>
+  </div>
+  <div class="mt-2">
+    <LessonProgress
+      topic={topicSlug}
+      lesson={lesson.slug}
+      len={lesson.checklistLen}
+      client:load
+    />
+  </div>
+</a>

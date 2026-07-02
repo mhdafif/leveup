@@ -1,0 +1,815 @@
+<!DOCTYPE html>
+<html lang="en" data-scheme="auto">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>LevelUp Part 2 — Spec / Plan</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700;900&family=JetBrains+Mono:wght@400;700&family=Inter:wght@300;400;500&display=swap" rel="stylesheet"/>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  /* ── THEME: DARK (zinc-950 + orange) ───────────────────────────── */
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-scheme="light"]) {
+      --bg:        #09090b;
+      --bg-card:   #18181b;
+      --border:    #27272a;
+      --border-dim:#1c1c1f;
+      --text:      #d4d4d8;
+      --text-muted:#71717a;
+      --text-dim:  #52525b;
+      --text-vdim: #3f3f46;
+      --accent:    #f97316;
+      --accent-6:  #ea580c;
+      --accent-9:  #7c2d12;
+      --accent-bg: rgba(234,88,12,0.08);
+      --accent-bd: rgba(234,88,12,0.25);
+      --red:       #ef4444;
+      --red-lt:    #f87171;
+      --green:     #4ade80;
+      --sidebar-bg:#111113;
+      --pre-bg:    #09090b;
+      --kbd-bg:    #18181b;
+      --kbd-border:#3f3f46;
+      --dot-color: rgba(234,88,12,0.04);
+      --glow:      0 0 20px rgba(234,88,12,0.3);
+    }
+  }
+
+  /* ── THEME: LIGHT (slate-50 + indigo-600) ──────────────────────── */
+  @media (prefers-color-scheme: light) {
+    :root:not([data-scheme="dark"]) {
+      --bg:        #f8fafc;
+      --bg-card:   #ffffff;
+      --border:    #e2e8f0;
+      --border-dim:#f1f5f9;
+      --text:      #1e293b;
+      --text-muted:#64748b;
+      --text-dim:  #94a3b8;
+      --text-vdim: #cbd5e1;
+      --accent:    #14b8a6;
+      --accent-6:  #0d9488;
+      --accent-9:  #134e4a;
+      --accent-bg: rgba(20,184,166,0.08);
+      --accent-bd: rgba(20,184,166,0.25);
+      --red:       #ef4444;
+      --red-lt:    #f87171;
+      --green:     #22c55e;
+      --sidebar-bg:#f1f5f9;
+      --pre-bg:    #f8fafc;
+      --kbd-bg:    #f1f5f9;
+      --kbd-border:#e2e8f0;
+      --dot-color: rgba(20,184,166,0.05);
+      --glow:      none;
+    }
+  }
+
+  /* ── FORCED DARK (overrides system) ────────────────────────────── */
+  :root[data-scheme="dark"] {
+    --bg:        #09090b;
+    --bg-card:   #18181b;
+    --border:    #27272a;
+    --border-dim:#1c1c1f;
+    --text:      #d4d4d8;
+    --text-muted:#71717a;
+    --text-dim:  #52525b;
+    --text-vdim: #3f3f46;
+    --accent:    #f97316;
+    --accent-6:  #ea580c;
+    --accent-9:  #7c2d12;
+    --accent-bg: rgba(234,88,12,0.08);
+    --accent-bd: rgba(234,88,12,0.25);
+    --red:       #ef4444;
+    --red-lt:    #f87171;
+    --green:     #4ade80;
+    --sidebar-bg:#111113;
+    --pre-bg:    #09090b;
+    --kbd-bg:    #18181b;
+    --kbd-border:#3f3f46;
+    --dot-color: rgba(234,88,12,0.04);
+    --glow:      0 0 20px rgba(234,88,12,0.3);
+  }
+
+  /* ── FORCED LIGHT (overrides system) ───────────────────────────── */
+  :root[data-scheme="light"] {
+    --bg:        #f8fafc;
+    --bg-card:   #ffffff;
+    --border:    #e2e8f0;
+    --border-dim:#f1f5f9;
+    --text:      #1e293b;
+    --text-muted:#64748b;
+    --text-dim:  #94a3b8;
+    --text-vdim: #cbd5e1;
+    --accent:    #14b8a6;
+    --accent-6:  #0d9488;
+    --accent-9:  #134e4a;
+    --accent-bg: rgba(20,184,166,0.08);
+    --accent-bd: rgba(20,184,166,0.25);
+    --red:       #ef4444;
+    --red-lt:    #f87171;
+    --green:     #22c55e;
+    --sidebar-bg:#f1f5f9;
+    --pre-bg:    #f8fafc;
+    --kbd-bg:    #f1f5f9;
+    --kbd-border:#e2e8f0;
+    --dot-color: rgba(20,184,166,0.05);
+    --glow:      none;
+  }
+
+  /* ── SIDEBAR WIDTH VAR ───────────────────────────────────────── */
+  :root { --sidebar-w: 220px; }
+
+  /* ── BASE ─────────────────────────────────────────────────────── */
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    line-height: 1.6;
+    min-height: 100vh;
+    background-image: radial-gradient(circle, var(--dot-color) 1px, transparent 1px);
+    background-size: 30px 30px;
+  }
+
+  /* ── THEME SWITCHER ────────────────────────────────────────────── */
+  .theme-switcher {
+    position: fixed;
+    top: 16px;
+    right: 16px;
+    z-index: 100;
+    display: flex;
+    gap: 6px;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 5px 8px;
+  }
+  .theme-btn {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    border: 2px solid transparent;
+    cursor: pointer;
+    transition: border-color 0.15s, transform 0.1s;
+  }
+  .theme-btn:hover { transform: scale(1.15); }
+  .theme-btn.active { border-color: var(--accent); }
+  .theme-btn[data-s="dark"]  { background: #09090b; outline: 1px solid #3f3f46; outline-offset: 1px; }
+  .theme-btn[data-s="light"] { background: #f8fafc; outline: 1px solid #e2e8f0; outline-offset: 1px; }
+
+  /* ── LAYOUT ───────────────────────────────────────────────────── */
+  .layout { display: flex; min-height: 100vh; }
+
+  /* ── SIDEBAR ──────────────────────────────────────────────────── */
+  .sidebar {
+    position: fixed;
+    top: 0; left: 0;
+    width: var(--sidebar-w);
+    height: 100vh;
+    background: var(--sidebar-bg);
+    border-right: 1px solid var(--border-dim);
+    padding: 28px 0;
+    overflow-y: auto;
+    overflow-x: hidden;
+    z-index: 10;
+    transition: width 0.25s ease, transform 0.25s ease;
+  }
+
+  /* ── COLLAPSED STATE ──────────────────────────────────────────── */
+  body.sidebar-collapsed { --sidebar-w: 0px; }
+  body.sidebar-collapsed .sidebar { border-right: none; }
+
+  /* ── SIDEBAR COLLAPSE BTN (always visible, moves with sidebar) ── */
+  .sidebar-collapse-btn {
+    position: fixed;
+    top: 14px;
+    left: var(--sidebar-w);
+    z-index: 30;
+    width: 28px;
+    height: 28px;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-dim);
+    font-size: 14px;
+    cursor: pointer;
+    transition: left 0.25s ease, color 0.15s, background 0.15s;
+    transform: translateX(8px);
+  }
+  .sidebar-collapse-btn:hover { color: var(--accent); background: var(--accent-bg); }
+
+  /* ── MOBILE HAMBURGER ─────────────────────────────────────────── */
+  .mobile-menu-btn {
+    display: none;
+    position: fixed;
+    top: 14px;
+    left: 14px;
+    z-index: 60;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 7px;
+    width: 36px;
+    height: 36px;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: color 0.15s, background 0.15s;
+  }
+  .mobile-menu-btn:hover { color: var(--accent); background: var(--accent-bg); }
+
+  /* ── MOBILE BACKDROP ──────────────────────────────────────────── */
+  .sidebar-backdrop {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.5);
+    z-index: 40;
+    opacity: 0;
+    transition: opacity 0.25s ease;
+  }
+  .sidebar-backdrop.open { opacity: 1; }
+  .sidebar-logo {
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 900;
+    font-size: 18px;
+    color: var(--accent-6);
+    text-shadow: var(--glow);
+    padding: 0 20px 24px;
+    border-bottom: 1px solid var(--border-dim);
+    display: block;
+    letter-spacing: -0.02em;
+  }
+  .sidebar-sub {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    color: var(--text-dim);
+    font-weight: 400;
+    display: block;
+    margin-top: 3px;
+    letter-spacing: 0.05em;
+  }
+  .nav-section-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    color: var(--text-vdim);
+    padding: 20px 20px 8px;
+  }
+  .nav-link {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 7px 20px;
+    font-size: 13px;
+    color: var(--text-muted);
+    text-decoration: none;
+    transition: color 0.15s, background 0.15s;
+    cursor: pointer;
+  }
+  .nav-link:hover { color: var(--accent); background: var(--accent-bg); }
+  .nav-link .num {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    color: var(--text-vdim);
+    min-width: 16px;
+  }
+
+  /* ── MAIN ─────────────────────────────────────────────────────── */
+  /* ── PAGE HEADER ──────────────────────────────────────────────── */
+  .page-header { margin-bottom: 40px; }
+  .page-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    color: var(--accent);
+    margin-bottom: 10px;
+  }
+  .page-title {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 2.4rem;
+    font-weight: 900;
+    color: var(--accent-6);
+    text-shadow: var(--glow);
+    letter-spacing: -0.02em;
+    line-height: 1;
+    margin-bottom: 10px;
+  }
+  .page-meta {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-top: 12px;
+  }
+  .meta-badge {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--text-muted);
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    padding: 3px 10px;
+  }
+
+  /* ── SECTIONS ─────────────────────────────────────────────────── */
+  .section { margin-bottom: 48px; scroll-margin-top: 24px; }
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 20px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--border-dim);
+  }
+  .section-num {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--accent);
+    background: var(--accent-bg);
+    border: 1px solid var(--accent-bd);
+    border-radius: 5px;
+    padding: 2px 8px;
+    min-width: 32px;
+    text-align: center;
+  }
+  .section-title {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: var(--text);
+  }
+  .new-badge {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: var(--accent);
+    background: var(--accent-bg);
+    border: 1px solid var(--accent-bd);
+    border-radius: 4px;
+    padding: 1px 6px;
+    letter-spacing: 0.1em;
+  }
+
+  /* ── CARDS ────────────────────────────────────────────────────── */
+  .card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 18px 20px;
+    margin-bottom: 14px;
+  }
+  .card-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .card-grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; }
+
+  /* ── TABLES ───────────────────────────────────────────────────── */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+    margin-bottom: 14px;
+  }
+  thead tr { background: var(--sidebar-bg); }
+  th {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--text-dim);
+    padding: 9px 14px;
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+  }
+  td {
+    padding: 9px 14px;
+    border-bottom: 1px solid var(--border-dim);
+    color: var(--text-muted);
+    vertical-align: top;
+  }
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: var(--accent-bg); }
+  td code { color: var(--accent); }
+  .td-green { color: var(--green); }
+  .td-red { color: var(--red-lt); }
+
+  /* ── CODE BLOCKS ──────────────────────────────────────────────── */
+  pre {
+    background: var(--pre-bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 16px 18px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    line-height: 1.8;
+    color: var(--text-muted);
+    overflow-x: auto;
+    margin-bottom: 14px;
+  }
+  .kw  { color: var(--accent); }
+  .fn  { color: var(--accent-6); }
+  .str { color: var(--green); }
+  .cm  { color: var(--text-vdim); }
+  .num { color: #60a5fa; }
+  .tp  { color: #c084fc; }
+
+  /* ── INLINE CODE ──────────────────────────────────────────────── */
+  code {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    background: var(--accent-bg);
+    color: var(--accent);
+    border: 1px solid var(--accent-bd);
+    border-radius: 4px;
+    padding: 1px 5px;
+  }
+
+  /* ── FILE TREE ────────────────────────────────────────────────── */
+  .file-tree {
+    background: var(--pre-bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 16px 18px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    line-height: 2;
+  }
+  .ft-dir  { color: var(--accent); }
+  .ft-file { color: var(--text-muted); }
+  .ft-cm   { color: var(--text-vdim); }
+  .ft-new  { color: var(--accent); font-weight: 700; }
+
+  /* ── FLOW DIAGRAMS ────────────────────────────────────────────── */
+  .flow {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    padding: 16px;
+    background: var(--pre-bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    margin-bottom: 14px;
+  }
+  .flow-state {
+    border-radius: 6px;
+    padding: 5px 12px;
+    font-size: 12px;
+    white-space: nowrap;
+  }
+  .flow-state.idle    { border: 1px solid var(--text-vdim); color: var(--text-dim); }
+  .flow-state.running { border: 1px solid var(--accent-bd); color: var(--accent); background: var(--accent-bg); }
+  .flow-state.paused  { border: 1px solid rgba(239,68,68,0.4); color: var(--red-lt); background: rgba(239,68,68,0.06); }
+  .flow-arrow { color: var(--accent); font-size: 13px; }
+  .flow-label { color: var(--text-dim); font-size: 10px; white-space: nowrap; }
+
+  /* ── COLOR SWATCHES ───────────────────────────────────────────── */
+  .swatches { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 14px; }
+  .swatch { text-align: center; }
+  .swatch-box { width: 100%; height: 44px; border-radius: 7px; margin-bottom: 7px; border: 1px solid var(--border); }
+  .swatch-name { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--text-muted); }
+  .swatch-hex  { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: var(--text-vdim); }
+
+  /* ── KEYBOARD ─────────────────────────────────────────────────── */
+  kbd {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    background: var(--kbd-bg);
+    border: 1px solid var(--kbd-border);
+    border-bottom: 2px solid var(--kbd-border);
+    border-radius: 5px;
+    padding: 2px 7px;
+    color: var(--text-muted);
+  }
+
+  /* ── NOTE / CALLOUT ───────────────────────────────────────────── */
+  .note {
+    background: var(--accent-bg);
+    border-left: 3px solid var(--accent-6);
+    border-radius: 0 7px 7px 0;
+    padding: 10px 14px;
+    font-size: 13px;
+    color: var(--text-muted);
+    margin-bottom: 14px;
+  }
+
+  /* ── MISC ─────────────────────────────────────────────────────── */
+  hr { border: none; border-top: 1px solid var(--border-dim); margin: 32px 0; }
+
+  h3 {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text);
+    margin: 20px 0 10px;
+  }
+
+  ul.spec-list { padding-left: 18px; color: var(--text-muted); line-height: 2; font-size: 13px; }
+  ul.spec-list li strong { color: var(--text); }
+
+  /* ── MAIN TRANSITION ─────────────────────────────────────────── */
+  .main { margin-left: var(--sidebar-w); padding: 48px 48px 80px; max-width: 900px; transition: margin-left 0.25s ease; }
+
+  /* ── RESPONSIVE ───────────────────────────────────────────────── */
+  @media (max-width: 768px) {
+    .sidebar {
+      display: block;
+      transform: translateX(-100%);
+      width: 260px;
+      z-index: 50;
+      transition: transform 0.25s ease;
+    }
+    .sidebar.open { transform: translateX(0); }
+    .sidebar-backdrop { display: block; }
+    .sidebar-collapse-btn { display: none; }
+    .mobile-menu-btn { display: flex; }
+    .main { margin-left: 0; padding: 24px 20px 60px; transition: none; }
+    .card-grid-2, .card-grid-3 { grid-template-columns: 1fr; }
+    .swatches { grid-template-columns: repeat(2, 1fr); }
+  }
+</style>
+</head>
+<body>
+
+<!-- Mobile hamburger -->
+<button class="mobile-menu-btn" onclick="toggleMobileNav()" aria-label="Open menu">☰</button>
+
+<!-- Mobile backdrop -->
+<div class="sidebar-backdrop" id="backdrop" onclick="closeMobileNav()"></div>
+
+<!-- Sidebar collapse/expand btn (desktop, moves with sidebar) -->
+<button class="sidebar-collapse-btn" id="sidebarCollapseBtn" onclick="toggleSidebar()" aria-label="Toggle sidebar">‹</button>
+
+<!-- Theme switcher (top-right) -->
+<div class="theme-switcher">
+  <div class="theme-btn" data-s="dark"  title="Dark"  onclick="setScheme('dark')"></div>
+  <div class="theme-btn" data-s="light" title="Light" onclick="setScheme('light')"></div>
+</div>
+
+<div class="layout">
+
+  <!-- Sidebar -->
+  <nav class="sidebar">
+    <span class="sidebar-logo">
+      LevelUp Part 2
+      <span class="sidebar-sub">SPEC / PLAN · v1 · 2026-06-27</span>
+    </span>
+    <div class="nav-section-label">Contents</div>
+    <a class="nav-link" href="#s1"><span class="num">01</span> Context &amp; goals</a>
+    <a class="nav-link" href="#s2"><span class="num">02</span> Architecture shift</a>
+    <a class="nav-link" href="#s3"><span class="num">03</span> Data model</a>
+    <a class="nav-link" href="#s4"><span class="num">04</span> Upload format</a>
+    <a class="nav-link" href="#s5"><span class="num">05</span> Client rendering</a>
+    <a class="nav-link" href="#s6"><span class="num">06</span> Store / index</a>
+    <a class="nav-link" href="#s7"><span class="num">07</span> Custom rewards</a>
+    <a class="nav-link" href="#s8"><span class="num">08</span> Upload UI</a>
+    <a class="nav-link" href="#s9"><span class="num">09</span> Search modal</a>
+    <a class="nav-link" href="#s10"><span class="num">10</span> Docs</a>
+    <a class="nav-link" href="#s11"><span class="num">11</span> Tasks</a>
+    <a class="nav-link" href="#s12"><span class="num">12</span> Verification</a>
+  </nav>
+
+  <!-- Main content -->
+  <main class="main">
+
+    <!-- Page header -->
+    <div class="page-header">
+      <div class="page-label">Spec / Plan</div>
+      <div class="page-title">LevelUp Part 2</div>
+      <div class="page-meta">
+        <span class="meta-badge">2026-06-27</span>
+        <span class="meta-badge">v1</span>
+        <span class="meta-badge">User content · Rewards · Search</span>
+      </div>
+    </div>
+
+    <div class="section" id="s1">
+      <div class="section-header"><span class="section-num">01</span><span class="section-title">Context &amp; goals</span></div>
+      <p>Part 1 shipped the base app: built-in markdown topics, checklist progress, gamification (coins/XP, badges, daily goal, confetti, reward shop), notes, export/import, Pagefind search, PWA, and VPS deploy. All state lives in one <code>localStorage</code> key (<code>levelup:data</code>).</p>
+      <p>Part 2 adds three capabilities <strong>without removing</strong> built-in topics:</p>
+      <div class="card-grid-3">
+        <div class="card"><h3>1 · Upload topics</h3><p>Upload a topic as one <code>.md</code> file; it's parsed and saved to browser storage, then behaves like a built-in topic.</p></div>
+        <div class="card"><h3>2 · Custom rewards</h3><p>A full editor (add / edit / delete). The current 6 become deletable seeded defaults with a reset.</p></div>
+        <div class="card"><h3>3 · Search modal</h3><p>Search becomes a popup (<kbd>Cmd/Ctrl</kbd>+<kbd>K</kbd>) showing results inline; the <code>/search</code> page is removed.</p></div>
+      </div>
+      <div class="note">Plus a documented markdown format (§4) shipped as a help doc, an in-app template download, and a link — so the user knows how to author an uploadable topic.</div>
+    </div>
+
+    <div class="section" id="s2">
+      <div class="section-header"><span class="section-num">02</span><span class="section-title">Architecture shift — client-rendered user content</span></div>
+      <p>Built-in topics are static (built at deploy time). User uploads can't be statically built, so user topics are <strong>parsed and rendered client-side</strong> from storage. The store's in-memory content index becomes the union of both sources:</p>
+      <div class="flow">
+        <div class="flow-state running">built-in index</div>
+        <span class="flow-arrow">+</span>
+        <div class="flow-state running">user topics</div>
+        <span class="flow-arrow">→</span>
+        <div class="flow-state idle">merged ContentIndex</div>
+        <span class="flow-arrow">→</span>
+        <span class="flow-label">progress · coins · badges · stats (unchanged)</span>
+      </div>
+      <p>Because <code>progress.ts</code> and <code>gamification.ts</code> are generic over a <code>ContentIndex</code> keyed by <code>topicSlug/lessonSlug</code>, everything works across both sources with no logic changes. User-topic ids are prefixed <code>u-&lt;slug&gt;-&lt;rand&gt;</code> so their keys never collide with built-in slugs.</p>
+    </div>
+
+    <div class="section" id="s3">
+      <div class="section-header"><span class="section-num">03</span><span class="section-title">Data model changes</span><span class="new-badge">new</span></div>
+      <p>Extend <code>AppData</code> in <code>src/lib/types.ts</code>; bump <code>version</code> 1 → 2; <code>migrate()</code> seeds the new fields. Both live inside <code>levelup:data</code>, so existing export/import and reset already cover them.</p>
+      <pre><span class="kw">interface</span> <span class="tp">UserLesson</span> { slug: <span class="tp">string</span>; title: <span class="tp">string</span>; checklist: <span class="tp">string</span>[]; body: <span class="tp">string</span>; estMinutes?: <span class="tp">number</span>; difficulty?: <span class="str">'easy'|'medium'|'hard'</span>; }
+<span class="kw">interface</span> <span class="tp">UserTopic</span>  { id: <span class="tp">string</span>; title: <span class="tp">string</span>; icon?: <span class="tp">string</span>; description?: <span class="tp">string</span>; createdAt: <span class="tp">string</span>; lessons: <span class="tp">UserLesson</span>[]; }
+
+<span class="cm">// added to AppData:</span>
+rewards: <span class="tp">Reward</span>[];        <span class="cm">// seeded from DEFAULT_REWARDS; editable/deletable</span>
+userTopics: <span class="tp">UserTopic</span>[];  <span class="cm">// uploaded topics</span></pre>
+      <div class="note"><strong>migrate():</strong> if <code>rewards</code> absent → seed <code>DEFAULT_REWARDS</code>; if <code>userTopics</code> absent → <code>[]</code>. Unit-test the v1 → v2 upgrade.</div>
+    </div>
+
+    <div class="section" id="s4">
+      <div class="section-header"><span class="section-num">04</span><span class="section-title">Topic markdown upload format</span></div>
+      <p><strong>One <code>.md</code> file = one topic.</strong> Top YAML frontmatter is the topic; each <code>#</code> H1 starts a subtopic; a <code>## Checklist</code> task list under a subtopic defines its checklist; everything else under the H1 is that subtopic's theory.</p>
+      <pre>---
+title: My Topic
+icon: "📦"
+description: One-line summary shown on the card.
+---
+
+# First Subtopic
+
+Theory markdown. Supports code blocks, &gt; [!NOTE] callouts, and ```mermaid diagrams.
+
+## Checklist
+- [ ] First thing to learn
+- [ ] Second thing to learn
+
+# Second Subtopic
+
+More theory...
+
+## Checklist
+- [ ] Another item</pre>
+      <table>
+        <thead><tr><th>Rule</th><th>Detail</th></tr></thead>
+        <tbody>
+          <tr><td>Frontmatter</td><td><code>title</code> required; <code>icon</code>, <code>description</code> optional (flat key: value).</td></tr>
+          <tr><td>Subtopics</td><td>Each <code>#</code> H1 = one subtopic; text = title; order = document order.</td></tr>
+          <tr><td>Checklist</td><td>The task list after a <code>## Checklist</code> heading; that section is stripped from the rendered body.</td></tr>
+          <tr><td>Minimums</td><td>≥1 subtopic per topic; a subtopic may have no checklist (renders body only).</td></tr>
+        </tbody>
+      </table>
+      <p>Parser <code>src/lib/parseTopic.ts</code> (pure, unit-tested) → <code>{ topic, errors[] }</code>: parse flat frontmatter, split by <code>#</code> headings, extract &amp; strip <code>## Checklist</code>, slugify titles, generate <code>u-&lt;slug&gt;-&lt;rand&gt;</code> id, and return clear validation messages.</p>
+    </div>
+
+    <div class="section" id="s5">
+      <div class="section-header"><span class="section-num">05</span><span class="section-title">Client-side rendering of user content</span></div>
+      <p><code>src/lib/renderMarkdown.ts</code> using <code>marked</code> (new dep), reusing Part 1 assets:</p>
+      <ul class="spec-list">
+        <li><strong>Mermaid</strong> — ```mermaid fences → <code>&lt;pre class="mermaid"&gt;</code> so the existing <code>Mermaid.svelte</code> renders them.</li>
+        <li><strong>Callouts</strong> — <code>&gt; [!NOTE|TIP|WARNING|CAUTION|IMPORTANT]</code> → existing <code>.markdown-alert</code> markup/CSS.</li>
+        <li><strong>Code highlighting</strong> — lazy-loaded Shiki (<code>github-light</code>/<code>github-dark</code>, emits <code>.astro-code</code>), loaded only on a user lesson view.</li>
+      </ul>
+      <p>User views are <strong>client-only</strong> (content is in storage, absent at build): one static page <code>src/pages/u.astro</code> hydrates <code>UserTopicView.svelte</code> with <code>client:only="svelte"</code>, routing by query:</p>
+      <table>
+        <thead><tr><th>URL</th><th>View</th></tr></thead>
+        <tbody>
+          <tr><td><code>/u?t=&lt;topicId&gt;</code></td><td>Subtopic list for that topic.</td></tr>
+          <tr><td><code>/u?t=&lt;topicId&gt;&amp;l=&lt;lessonSlug&gt;</code></td><td>Lesson: rendered body + reused <code>Checklist</code> + <code>Notes</code>.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="section" id="s6">
+      <div class="section-header"><span class="section-num">06</span><span class="section-title">Store / index integration</span></div>
+      <ul class="spec-list">
+        <li>New pure helper <code>userTopicsAsIndex(userTopics)</code> → <code>TopicMeta[]</code> (id as slug, lessons → <code>checklistLen</code>).</li>
+        <li><code>ensureIndex()</code> returns the merged index = built-in fetched + <code>userTopicsAsIndex</code>; recomputed when <code>userTopics</code> changes.</li>
+        <li>New actions: <code>addUserTopic</code>, <code>deleteUserTopic</code> (also purge its progress/notes keys), <code>addReward</code>, <code>updateReward</code>, <code>deleteReward</code>, <code>resetRewards</code>.</li>
+        <li><code>StatsSummary</code> overall % uses the merged index so uploaded topics count too.</li>
+      </ul>
+    </div>
+
+    <div class="section" id="s7">
+      <div class="section-header"><span class="section-num">07</span><span class="section-title">Custom rewards</span><span class="new-badge">new</span></div>
+      <ul class="spec-list">
+        <li><code>src/data/rewards.ts</code> keeps <code>DEFAULT_REWARDS</code> (current 6) + <code>WEEKLY_ALLOWANCE_CAP</code>; the shop stops importing the list directly.</li>
+        <li><code>RewardShop.svelte</code> reads <code>$appData.rewards</code>; <code>RewardRow</code>/<code>RedemptionList</code> resolve metadata from it (fallback to id).</li>
+        <li>New <code>RewardEditor.svelte</code> on <code>/rewards</code>: list with edit/delete, an "Add reward" form (name, emoji, coin cost, rupiah — validated positive), and "Reset to defaults". Custom rewards persist and survive export/import.</li>
+      </ul>
+    </div>
+
+    <div class="section" id="s8">
+      <div class="section-header"><span class="section-num">08</span><span class="section-title">Upload &amp; management UI</span></div>
+      <div class="card-grid-2">
+        <div class="card"><h3>UploadTopicModal + AddTopicButton</h3><p><code>.md</code> file input or paste → <code>parseTopic</code> → preview (title, subtopics, item counts) + errors → "Add to my topics". Includes "Download template" and a link to the format doc.</p></div>
+        <div class="card"><h3>UserTopics island</h3><p>On <code>index.astro</code>: lists uploaded topics (link <code>/u?t=...</code>, progress via merged index, delete + confirm) plus the Add-topic button, under the built-in <code>TopicCard</code> grid.</p></div>
+      </div>
+    </div>
+
+    <div class="section" id="s9">
+      <div class="section-header"><span class="section-num">09</span><span class="section-title">Search modal (replaces /search)</span></div>
+      <p>Delete <code>src/pages/search.astro</code>. The header "Search" becomes a button opening a global <code>SearchModal.svelte</code> (mounted in <code>Base.astro</code>, <code>client:idle</code>); also <kbd>Cmd/Ctrl</kbd>+<kbd>K</kbd>, close on <kbd>Esc</kbd>.</p>
+      <table>
+        <thead><tr><th>Source</th><th>Mechanism</th></tr></thead>
+        <tbody>
+          <tr><td>Built-in lessons</td><td>Pagefind <strong>JS API</strong> (<code>import('/pagefind/pagefind.js')</code>, production build only).</td></tr>
+          <tr><td>Uploaded topics</td><td>Lightweight client filter over <code>userTopics</code> (title + checklist + body).</td></tr>
+        </tbody>
+      </table>
+      <div class="note">Built-in results only appear against a production build (Pagefind is build-time). Uploaded-topic results work everywhere, including <code>pnpm dev</code>.</div>
+    </div>
+
+    <div class="section" id="s10">
+      <div class="section-header"><span class="section-num">10</span><span class="section-title">Docs deliverables</span></div>
+      <div class="file-tree">
+        <div><span class="ft-dir">docs/specs/</span></div>
+        <div>&nbsp;&nbsp;<span class="ft-file">2026-06-27-part-2-user-content.md / .html</span> &nbsp;<span class="ft-cm">— this spec</span></div>
+        <div>&nbsp;&nbsp;<span class="ft-new">2026-06-27-topic-markdown-format.md / .html</span> &nbsp;<span class="ft-cm">— author's guide ★</span></div>
+        <div><span class="ft-dir">public/templates/</span></div>
+        <div>&nbsp;&nbsp;<span class="ft-new">topic-template.md</span> &nbsp;<span class="ft-cm">— downloadable starter ★</span></div>
+        <div><span class="ft-file">README.md</span> &nbsp;<span class="ft-cm">— update "Adding study content"</span></div>
+      </div>
+    </div>
+
+    <div class="section" id="s11">
+      <div class="section-header"><span class="section-num">11</span><span class="section-title">Tasks (TDD where pure)</span></div>
+      <table>
+        <thead><tr><th>#</th><th>Task</th></tr></thead>
+        <tbody>
+          <tr><td>1</td><td>Extend <code>AppData</code> (rewards, userTopics) + <code>migrate</code> seeding + version bump; tests.</td></tr>
+          <tr><td>2</td><td><code>parseTopic.ts</code> + tests — frontmatter, subtopic split, checklist extract/strip, slug/id, errors.</td></tr>
+          <tr><td>3</td><td><code>userTopicsAsIndex</code> + merged <code>ensureIndex</code> + store actions; index-merge tests.</td></tr>
+          <tr><td>4</td><td><code>renderMarkdown.ts</code> (marked + mermaid/callout hooks + lazy Shiki).</td></tr>
+          <tr><td>5</td><td><code>UserTopicView.svelte</code> + <code>u.astro</code> (client:only) reusing Checklist/Notes.</td></tr>
+          <tr><td>6</td><td><code>UploadTopicModal</code> + <code>AddTopicButton</code> + <code>UserTopics</code>; wire into home.</td></tr>
+          <tr><td>7</td><td>Rewards: shop reads <code>$appData.rewards</code>; add <code>RewardEditor.svelte</code>.</td></tr>
+          <tr><td>8</td><td><code>SearchModal.svelte</code> (Pagefind API + userTopics filter); header → button; delete <code>search.astro</code>.</td></tr>
+          <tr><td>9</td><td>Docs: format guide (html+md), <code>topic-template.md</code>, README update.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="section" id="s12">
+      <div class="section-header"><span class="section-num">12</span><span class="section-title">Verification</span></div>
+      <ul class="spec-list">
+        <li><code>pnpm test</code> — new <code>parseTopic</code> + index-merge tests pass with the existing 32.</li>
+        <li>Upload the template <code>.md</code> → topic on home → subtopics → lesson renders (code/callout/mermaid) with working checklist + notes; checking items awards coins and counts toward overall % / badges.</li>
+        <li>Delete a user topic (confirm) → gone; progress/notes keys purged.</li>
+        <li><code>/rewards</code>: add a custom reward, edit it, delete a default, reset to defaults; redeem still works; survives an export → clear → import round-trip.</li>
+        <li>Search: <kbd>Cmd/Ctrl</kbd>+<kbd>K</kbd> opens the modal; built-in (prod build) + uploaded results; <kbd>Esc</kbd> closes; <code>/search</code> removed.</li>
+        <li><code>pnpm build</code> succeeds; PWA + Pagefind intact.</li>
+      </ul>
+    </div>
+
+  </main>
+</div>
+
+<script>
+  function setScheme(s) {
+    document.documentElement.setAttribute('data-scheme', s);
+    document.querySelectorAll('.theme-btn').forEach(b => {
+      b.classList.toggle('active', b.dataset.s === s);
+    });
+    localStorage.setItem('doc-scheme', s);
+  }
+  // Restore saved theme preference
+  const saved = localStorage.getItem('doc-scheme');
+  const preferred = saved || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+  document.documentElement.setAttribute('data-scheme', preferred);
+  document.addEventListener('DOMContentLoaded', () => {
+    document.querySelectorAll('.theme-btn').forEach(b => {
+      b.classList.toggle('active', b.dataset.s === preferred);
+    });
+  });
+
+  // Desktop sidebar collapse
+  function toggleSidebar() {
+    const collapsed = document.body.classList.toggle('sidebar-collapsed');
+    document.getElementById('sidebarCollapseBtn').textContent = collapsed ? '›' : '‹';
+    localStorage.setItem('sidebar-collapsed', collapsed);
+  }
+  if (localStorage.getItem('sidebar-collapsed') === 'true') {
+    document.body.classList.add('sidebar-collapsed');
+    document.getElementById('sidebarCollapseBtn').textContent = '›';
+  }
+
+  // Mobile drawer
+  function toggleMobileNav() {
+    document.querySelector('.sidebar').classList.toggle('open');
+    document.getElementById('backdrop').classList.toggle('open');
+  }
+  function closeMobileNav() {
+    document.querySelector('.sidebar').classList.remove('open');
+    document.getElementById('backdrop').classList.remove('open');
+  }
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeMobileNav(); });
+</script>
+</body>
+</html>

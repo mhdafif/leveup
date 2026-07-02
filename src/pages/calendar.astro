@@ -1,0 +1,13 @@
+---
+import Base from "../layouts/Base.astro";
+import LearningCalendar from "../components/LearningCalendar.svelte";
+---
+<Base title="Calendar" description="Your study activity calendar.">
+  <h1 class="text-2xl font-semibold text-text-primary">Learning calendar</h1>
+  <p class="mt-1 text-text-muted">
+    Checklist progress, reviews, and focus sessions in one activity view.
+  </p>
+  <div class="mt-6">
+    <LearningCalendar client:load />
+  </div>
+</Base>

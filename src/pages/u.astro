@@ -1,0 +1,7 @@
+---
+import Base from "../layouts/Base.astro";
+import UserTopicView from "../components/UserTopicView.svelte";
+---
+<Base title="My topic">
+  <UserTopicView client:only="svelte" />
+</Base>

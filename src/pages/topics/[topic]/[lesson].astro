@@ -1,0 +1,49 @@
+---
+import { getCollection, render } from "astro:content";
+import Base from "../../../layouts/Base.astro";
+import Mermaid from "../../../components/Mermaid.svelte";
+import Checklist from "../../../components/Checklist.svelte";
+import Notes from "../../../components/Notes.svelte";
+import RoadmapLinks from "../../../components/RoadmapLinks.svelte";
+
+export async function getStaticPaths() {
+  const lessons = await getCollection("lessons");
+  return lessons.map((entry) => {
+    const [topic, lesson] = entry.id.split("/");
+    return { params: { topic, lesson }, props: { entry } };
+  });
+}
+
+const { entry } = Astro.props;
+const { Content } = await render(entry);
+const [topicSlug, lessonSlug] = entry.id.split("/");
+const { checklist } = entry.data;
+---
+<Base title={entry.data.title}>
+  <a href={`/topics/${topicSlug}`} class="text-sm font-medium text-active hover:underline">
+    ← Back to topic
+  </a>
+  <div class="mt-4 grid gap-8 lg:grid-cols-[1fr_20rem]">
+    <article
+      class="prose prose-invert max-w-none"
+      data-pagefind-body
+      data-pagefind-meta={`topic:${topicSlug}`}
+    >
+      <h1 class="mb-2">{entry.data.title}</h1>
+      <Content />
+    </article>
+    <aside class="space-y-4 lg:sticky lg:top-24 lg:self-start">
+      {checklist.length > 0 && (
+        <Checklist
+          topic={topicSlug}
+          lesson={lessonSlug}
+          items={checklist}
+          client:load
+        />
+      )}
+      <Notes topic={topicSlug} lesson={lessonSlug} client:load />
+    </aside>
+  </div>
+  <Mermaid client:idle />
+  {topicSlug === "frontend-path" && <RoadmapLinks client:load />}
+</Base>

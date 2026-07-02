@@ -1,0 +1,144 @@
+@import "tailwindcss" source("../");
+@plugin "@tailwindcss/typography";
+
+@theme {
+  /* Tier 1 — primitives */
+  --color-slate-950: #0B0F14;
+  --color-slate-900: #121822;
+  --color-slate-850: #1A2230;
+  --color-slate-800: #232C3A;
+  --color-slate-400: #76869C;
+  --color-slate-200: #CFD8E3;
+  --color-amber-500: #F5A623;
+  --color-amber-950: #3A2B12;
+  --color-teal-400: #2DD4BF;
+  --color-emerald-400: #34D399;
+  --color-rose-500: #F43F5E;
+  --color-paper-100: #ECE4D3;
+
+  /* Tier 2 — semantic (the re-theme surface) */
+  --color-ink: var(--color-slate-950);
+  --color-panel: var(--color-slate-900);
+  --color-panel-soft: var(--color-slate-850);
+  --color-line: var(--color-slate-800);
+  --color-text-primary: var(--color-slate-200);
+  --color-text-muted: var(--color-slate-400);
+  --color-active: var(--color-amber-500);
+  --color-active-soft: var(--color-amber-950);
+  --color-complete: var(--color-emerald-400);
+  --color-info: var(--color-teal-400);
+  --color-urgency: var(--color-rose-500);
+  --color-paper: var(--color-paper-100);
+
+  --font-display: "Fraunces", Georgia, serif;
+  --font-body: "Inter", system-ui, sans-serif;
+  --font-data: "IBM Plex Mono", ui-monospace, monospace;
+
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+}
+
+@layer base {
+  :root {
+    color-scheme: dark;
+  }
+  body {
+    @apply bg-ink text-text-primary font-body antialiased;
+  }
+  a {
+    @apply transition-colors;
+  }
+}
+
+/* Tailwind Typography wraps inline <code> in literal backticks by default. */
+.prose :where(code):not(:where([class~="not-prose"] *))::before,
+.prose :where(code):not(:where([class~="not-prose"] *))::after {
+  content: "" !important;
+}
+
+
+
+/* GitHub-style callouts (> [!NOTE] etc.) emitted by remark-github-blockquote-alert. */
+.markdown-alert {
+  @apply my-4 rounded-r-md border-l-4 px-4 py-2;
+}
+.markdown-alert > :first-child {
+  @apply mt-0;
+}
+.markdown-alert > :last-child {
+  @apply mb-0;
+}
+.markdown-alert-title {
+  @apply mb-1 flex items-center gap-2 font-semibold;
+}
+.markdown-alert-note {
+  @apply border-info bg-panel;
+}
+.markdown-alert-note .markdown-alert-title {
+  @apply text-info;
+}
+.markdown-alert-tip {
+  @apply border-active bg-panel;
+}
+.markdown-alert-tip .markdown-alert-title {
+  @apply text-active;
+}
+.markdown-alert-important {
+  @apply border-info bg-panel;
+}
+.markdown-alert-important .markdown-alert-title {
+  @apply text-info font-bold;
+}
+.markdown-alert-warning {
+  @apply border-active bg-panel;
+}
+.markdown-alert-warning .markdown-alert-title {
+  @apply text-active font-bold;
+}
+.markdown-alert-caution {
+  @apply border-urgency bg-panel;
+}
+.markdown-alert-caution .markdown-alert-title {
+  @apply text-urgency;
+}
+
+/* Mermaid: hide raw source until the island swaps in the rendered SVG. */
+pre.mermaid {
+  @apply flex justify-center bg-transparent p-0;
+}
+pre.mermaid:not([data-rendered]) {
+  @apply text-transparent;
+}
+
+/* Stamp-in: plays when a checklist item is marked complete. */
+@keyframes strata-stamp {
+  0% { transform: scale(0.85); opacity: 0.4; }
+  60% { transform: scale(1.12); }
+  100% { transform: scale(1); opacity: 1; }
+}
+.stamp-in {
+  animation: strata-stamp 260ms cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+@media (prefers-reduced-motion: reduce) {
+  .stamp-in {
+    animation: none !important;
+  }
+  .row-hover {
+    transition: none !important;
+  }
+}
+
+/* Focus is always visible — this is a console, not a brochure. */
+*:focus-visible {
+  outline: 2px solid var(--color-active);
+  outline-offset: 2px;
+}
+
+/* Lesson content typography: display font for headings, mono for code/data. */
+.prose :where(h1, h2, h3, h4) {
+  font-family: var(--font-display);
+}
+.prose :where(code, pre) {
+  font-family: var(--font-data);
+}
