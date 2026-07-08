@@ -1,7 +1,7 @@
 <script lang="ts">
   import type { DayActivity } from "../lib/activity";
 
-  let { day }: { day: DayActivity } = $props();
+  let { day, dimmed = false }: { day: DayActivity; dimmed?: boolean } = $props();
   const classes = ["bg-slate-850", "bg-emerald-950", "bg-emerald-900", "bg-emerald-700", "bg-emerald-400"];
   const minutes = $derived(Math.round(day.focusSeconds / 60));
   const contributionCount = $derived(day.checklistCount + day.reviewCount + day.focusCount);
@@ -27,10 +27,10 @@
   }
 </script>
 
-<span class="inline-block">
+<span class="block w-full min-w-1.5">
   <button
     type="button"
-    class={`h-3.5 w-3.5 rounded-[3px] border border-line/70 ${classes[day.intensity]}`}
+    class={`aspect-square w-full rounded-[3px] border border-line/70 transition-opacity duration-300 ${classes[day.intensity]} ${dimmed ? "opacity-25" : "opacity-100"}`}
     aria-label={`${contributionCount} contributions on ${formattedDate}: ${day.checklistCount} checklist items, ${day.reviewCount} reviews, ${day.focusCount} focus sessions, ${minutes} focus minutes`}
     onpointerenter={(event) => positionTooltip(event.currentTarget)}
     onpointerleave={() => (showTooltip = false)}

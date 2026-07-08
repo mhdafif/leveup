@@ -10,7 +10,7 @@
   const reached = $derived(done >= target && target > 0);
 </script>
 
-<div class="rounded-md border border-line bg-panel p-4 space-y-6">
+<div class="rounded-md border border-line bg-panel-soft p-4 space-y-6">
   <div class="flex items-center justify-between">
     <span class="flex items-center gap-2 text-sm font-medium text-text-primary">
       <span aria-hidden="true">🎯</span> Daily goal

@@ -1,7 +1,6 @@
 ---
 import Base from "../layouts/Base.astro";
-import LearningCalendar from "../components/LearningCalendar.svelte";
-import HomeActivitySummary from "../components/HomeActivitySummary.svelte";
+import CalendarDashboard from "../components/CalendarDashboard.svelte";
 import TopicAccordion from "../components/TopicAccordion.svelte";
 import UserTopics from "../components/UserTopics.svelte";
 import { getTopics } from "../lib/content";
@@ -14,9 +13,8 @@ const topics = await getTopics();
     Pick a topic to study. Your progress is tracked automatically.
   </p>
 
-  <div class="mt-5 grid gap-4 lg:grid-cols-[1fr_20rem]">
-    <LearningCalendar compact client:load />
-    <HomeActivitySummary client:load />
+  <div class="mt-5">
+    <CalendarDashboard client:load />
   </div>
 
   <h2 class="mt-8 mb-3 font-data text-xs font-semibold tracking-widest text-text-muted uppercase">
