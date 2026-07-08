@@ -1,5 +1,5 @@
 import { atom } from "nanostores";
-import type { AppData, ContentIndex, Redemption, ReviewEase, Reward, StudyActivity, TopicMeta, UserTopic } from "./types";
+import type { AppData, ContentIndex, DifficultyMode, Redemption, ReviewEase, Reward, StudyActivity, TopicMeta, UserTopic } from "./types";
 import {
   createLocalStorageAdapter,
   defaultData,
@@ -137,6 +137,12 @@ export async function toggleItem(
 
   appData.set(next);
   return { delta, newBadges, goalReached };
+}
+
+export function setDifficultyMode(mode: DifficultyMode): void {
+  const prev = appData.get();
+  if (prev.difficultyMode === mode) return;
+  appData.set({ ...prev, difficultyMode: mode });
 }
 
 export function setNote(key: string, text: string): void {

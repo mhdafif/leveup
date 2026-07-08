@@ -3,7 +3,7 @@ import { DAILY_GOAL_DEFAULT } from "../data/config";
 import { DEFAULT_REWARDS } from "../data/rewards";
 
 export const STORAGE_KEY = "levelup:data";
-export const DATA_VERSION = 3;
+export const DATA_VERSION = 4;
 
 const seededRewards = () => DEFAULT_REWARDS.map((r) => ({ ...r }));
 
@@ -11,6 +11,7 @@ export function defaultData(): AppData {
   return {
     version: DATA_VERSION,
     theme: "light",
+    difficultyMode: "expert",
     progress: {},
     notes: {},
     coins: 0,
@@ -37,6 +38,7 @@ export function migrate(raw: unknown): AppData {
     ...base,
     ...d,
     version: DATA_VERSION,
+    difficultyMode: d.difficultyMode ?? base.difficultyMode,
     progress: d.progress ?? base.progress,
     notes: d.notes ?? base.notes,
     badges: d.badges ?? base.badges,

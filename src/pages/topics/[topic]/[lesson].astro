@@ -5,6 +5,9 @@ import Mermaid from "../../../components/Mermaid.svelte";
 import Checklist from "../../../components/Checklist.svelte";
 import Notes from "../../../components/Notes.svelte";
 import RoadmapLinks from "../../../components/RoadmapLinks.svelte";
+import DifficultySwitch from "../../../components/DifficultySwitch.svelte";
+import LessonVariant from "../../../components/LessonVariant.svelte";
+import AbbrEnhancer from "../../../components/AbbrEnhancer.svelte";
 
 export async function getStaticPaths() {
   const lessons = await getCollection("lessons");
@@ -18,21 +21,39 @@ const { entry } = Astro.props;
 const { Content } = await render(entry);
 const [topicSlug, lessonSlug] = entry.id.split("/");
 const { checklist } = entry.data;
+
+// Optional authored beginner variant (NN-slug.easy.md), matched by shared id.
+const easyEntries = await getCollection("lessonsEasy");
+const easyEntry = easyEntries.find((e) => e.id === entry.id);
+const EasyContent = easyEntry ? (await render(easyEntry)).Content : null;
 ---
 <Base title={entry.data.title}>
-  <a href={`/topics/${topicSlug}`} class="text-sm font-medium text-active hover:underline">
-    ← Back to topic
-  </a>
+  <div class="flex flex-wrap items-center justify-between gap-3">
+    <a href={`/topics/${topicSlug}`} class="text-sm font-medium text-active hover:underline">
+      ← Back to topic
+    </a>
+    <DifficultySwitch hasEasy={!!EasyContent} client:load />
+  </div>
   <div class="mt-4 grid gap-8 lg:grid-cols-[1fr_20rem]">
-    <article
-      class="prose prose-invert max-w-none"
-      data-pagefind-body
-      data-pagefind-meta={`topic:${topicSlug}`}
-    >
-      <h1 class="mb-2">{entry.data.title}</h1>
-      <Content />
-    </article>
-    <aside class="space-y-4 lg:sticky lg:top-24 lg:self-start">
+    <div>
+      <article
+        class="prose prose-invert max-w-none"
+        data-variant="expert"
+        data-lesson-body
+        data-pagefind-body
+        data-pagefind-meta={`topic:${topicSlug}`}
+      >
+        <h1 class="mb-2">{entry.data.title}</h1>
+        <Content />
+      </article>
+      {EasyContent && (
+        <article class="prose prose-invert max-w-none" data-variant="easy" data-lesson-body hidden>
+          <h1 class="mb-2">{entry.data.title}</h1>
+          <EasyContent />
+        </article>
+      )}
+    </div>
+    <aside class="flex flex-col gap-4 lg:sticky lg:top-24 lg:self-start">
       {checklist.length > 0 && (
         <Checklist
           topic={topicSlug}
@@ -45,5 +66,7 @@ const { checklist } = entry.data;
     </aside>
   </div>
   <Mermaid client:idle />
+  <LessonVariant hasEasy={!!EasyContent} client:load />
+  <AbbrEnhancer client:load />
   {topicSlug === "frontend-path" && <RoadmapLinks client:load />}
 </Base>

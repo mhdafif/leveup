@@ -67,7 +67,7 @@
       <h1 class="mb-2">{lesson.title}</h1>
       {@html html}
     </article>
-    <aside class="space-y-4 lg:sticky lg:top-24 lg:self-start">
+    <aside class="flex flex-col gap-4 lg:sticky lg:top-24 lg:self-start">
       {#if lesson.checklist.length > 0}
         <Checklist topic={topic.id} lesson={lesson.slug} items={lesson.checklist} />
       {/if}
