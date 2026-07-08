@@ -59,6 +59,14 @@
   function onKeydown(e: KeyboardEvent) {
     if (e.key === "Escape") onClose();
   }
+
+  // Lock background scroll while the drawer is open. The cleanup return removes
+  // the class on close, Escape, backdrop click, or unmount/navigation.
+  $effect(() => {
+    if (typeof document === "undefined") return;
+    document.body.classList.toggle("overflow-hidden", open);
+    return () => document.body.classList.remove("overflow-hidden");
+  });
 </script>
 
 <svelte:window onkeydown={onKeydown} />

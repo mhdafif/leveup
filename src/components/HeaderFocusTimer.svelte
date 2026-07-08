@@ -1,6 +1,14 @@
 <script lang="ts">
-  import { onDestroy } from "svelte";
+  import { onMount } from "svelte";
   import { completeFocusSession } from "../lib/store";
+  import {
+    timerState,
+    computeRemaining,
+    startTimer,
+    pauseTimer,
+    resetTimer,
+    setDuration,
+  } from "../lib/timerStore";
 
   const presets = [
     { label: "5m", seconds: 300 },
@@ -9,57 +17,48 @@
   ];
 
   let open = $state(false);
-  let selected = $state(1500);
-  let remaining = $state(1500);
-  let running = $state(false);
-  let timer: ReturnType<typeof setInterval> | null = null;
   let result = $state<{ coins: number; xp: number; seconds: number } | null>(null);
   let customMinutes = $state(25);
   let root: HTMLDivElement;
+  let now = $state(Date.now());
 
+  onMount(() => {
+    const id = setInterval(() => (now = Date.now()), 1000);
+    return () => clearInterval(id);
+  });
+
+  const selected = $derived($timerState.selectedSeconds);
+  const running = $derived($timerState.running);
+  const remaining = $derived(computeRemaining($timerState, now));
   const elapsed = $derived(selected - remaining);
   const label = $derived(`${Math.floor(remaining / 60)}:${String(remaining % 60).padStart(2, "0")}`);
 
-  function stopTimer() {
-    if (timer) clearInterval(timer);
-    timer = null;
-    running = false;
-  }
+  // Auto-settle a running timer that reaches zero.
+  $effect(() => {
+    if ($timerState.running && remaining <= 0) pauseTimer();
+  });
 
   function start() {
-    if (running) return;
     result = null;
-    running = true;
-    timer = setInterval(() => {
-      remaining = Math.max(0, remaining - 1);
-      if (remaining === 0) stopTimer();
-    }, 1000);
-  }
-
-  function reset(seconds = selected) {
-    stopTimer();
-    selected = seconds;
-    remaining = seconds;
-    result = null;
+    startTimer();
   }
 
   function applyCustomTime() {
     const minutes = Math.max(1, Math.min(180, Math.round(customMinutes) || 1));
     customMinutes = minutes;
-    reset(minutes * 60);
+    setDuration(minutes * 60);
   }
 
   function complete() {
-    stopTimer();
-    result = completeFocusSession(elapsed);
-    remaining = selected;
+    const done = elapsed;
+    pauseTimer();
+    result = completeFocusSession(done);
+    resetTimer(selected);
   }
 
   function onWindowPointerdown(event: PointerEvent) {
     if (open && root && !root.contains(event.target as Node)) open = false;
   }
-
-  onDestroy(stopTimer);
 </script>
 
 <svelte:window on:pointerdown={onWindowPointerdown} />
@@ -87,7 +86,7 @@
         {#each presets as preset}
           <button
             type="button"
-            onclick={() => reset(preset.seconds)}
+            onclick={() => setDuration(preset.seconds)}
             class={`rounded-md px-2.5 py-1 text-xs font-medium ${selected === preset.seconds ? "bg-active text-ink" : "border border-line text-text-primary hover:bg-panel-soft"}`}
           >
             {preset.label}
@@ -117,7 +116,7 @@
 
       <div class="mt-3 flex gap-2">
         <button type="button" onclick={start} disabled={running} class="flex-1 rounded-md bg-active px-3 py-1.5 text-sm font-medium text-ink disabled:opacity-50">Start</button>
-        <button type="button" onclick={stopTimer} disabled={!running} class="flex-1 rounded-md border border-line px-3 py-1.5 text-sm font-medium text-text-primary hover:bg-panel-soft disabled:opacity-50">Pause</button>
+        <button type="button" onclick={pauseTimer} disabled={!running} class="flex-1 rounded-md border border-line px-3 py-1.5 text-sm font-medium text-text-primary hover:bg-panel-soft disabled:opacity-50">Pause</button>
         <button type="button" onclick={complete} disabled={elapsed <= 0} class="flex-1 rounded-md border border-complete px-3 py-1.5 text-sm font-medium text-complete hover:bg-panel-soft disabled:opacity-50">Save</button>
       </div>
 
