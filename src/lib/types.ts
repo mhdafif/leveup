@@ -83,9 +83,13 @@ export interface UserTopic {
 }
 
 /** Everything persisted to the single `levelup:data` localStorage key. */
+export type DifficultyMode = "easy" | "expert";
+
 export interface AppData {
   version: number;
   theme: "light" | "dark";
+  /** Global content difficulty: "easy" swaps in beginner lesson variants + inline abbreviation meanings. */
+  difficultyMode: DifficultyMode;
   /** key `${topicSlug}/${lessonSlug}` -> per-checklist-item booleans */
   progress: Record<string, boolean[]>;
   /** key `${topicSlug}/${lessonSlug}` -> personal note text */
