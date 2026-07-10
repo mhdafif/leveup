@@ -8,4 +8,4 @@ cmds = ["pnpm install --frozen-lockfile --prod=false"]
 cmds = ["pnpm build"]
 
 [start]
-cmd = "pnpm preview --host 0.0.0.0 --port ${PORT:-4321}"
+cmd = "pnpm serve dist -l ${PORT:-4321}"
