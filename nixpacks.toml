@@ -6,6 +6,3 @@ cmds = ["pnpm install --frozen-lockfile --prod=false"]
 
 [phases.build]
 cmds = ["pnpm build"]
-
-[start]
-cmd = "pnpm serve dist -l ${PORT:-4321}"
